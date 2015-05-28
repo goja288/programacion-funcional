@@ -1,14 +1,15 @@
 module Eval (eval) where
 
 import AwkiSA
-import Memoria
+import Data.Map (Map)
+import qualified Data.Map as Map
 
-eval :: [Memoria] -> Expr -> ([Memoria], Valor)
+eval :: Map -> Expr -> (Map, Valor)
 
 -- DEFINIMOS LA EVALUACION DE LAS EXPESIONES ATOMICAS ------------------------------------------------------------------------
 eval m (Lit v) = (m, v)
 
-eval m (Var s) = (m, Str (getValor s m))
+eval m (Var s) = (m, Str (Map.lookup s m))
 
 -- DEFINIMOS LAS EXPRESIONES DE LAS OPERACIONES DOS PARAMETROS ---------------------------------------------------------------
 eval m (Op2 Add a b) = (m, (snd (eval m a)) + (snd (eval m b))) -- FUNCIONA PORQUE Valor implementa Num
@@ -19,11 +20,11 @@ eval m (Op2 Mul a b) = (m, (snd (eval m a)) * (snd (eval m b))) -- FUNCIONA PORQ
 
 eval m (Op2 Div a b) 
 	| (toInt (snd (eval m b))) /= 0 = (m, Num (div  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
-	| otherwise = (m, 0) -- VER QUE PASA CUANDO EL DIVISOR ES 0.
+	| otherwise = Map.insert "errorFlag" (Str "ERROR: DIVISION POR 0") m 
 	
 eval m (Op2 Mod a b) 
 	| (toInt (snd (eval m b))) /= 0 = (m, Num (mod  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
-	| otherwise = (m, 0) -- VER QUE PASA CUANDO EL DIVISOR ES 0.
+	| otherwise = Map.insert "errorFlag" (Str "ERROR: DIVISION POR 0") m
 
 -- VER ALGUN EJEMPLO COMO HIZO EL RESTO CON EL TEMA DE LAS COMPARACIONES, QUE DEVUELVEN?
 eval m (Op2 Lt a b) 
@@ -72,17 +73,17 @@ eval m (Op1 Not a)
 -- eval [("$1", "10")] (Op1 Not (Op2 Lt (Var "$1") (Lit (Num 1))))
 
 -- DEFINIMOS LAS ASIGNACIONES DE VARIABLES -----------------------------------------------------------------------------------
-eval m (Assign s a) = (addElem (s, (show (snd (eval m a)))) m, snd (eval m a))
+eval m (Assign s a) = (Map.insert s (show (snd (eval m a))) m, snd (eval m a))
 
 -- DEFINIMOS LAS ACUMULACIONES -----------------------------------------------------------------------------------------------
-eval m (Accum b s a) = ((addElem (s, (show (snd (eval m (Op2 b (Var s) a))))) m), (snd (eval m (Op2 b (Var s) a))))
+eval m (Accum b s a) = ((Map.insert s (show (snd (eval m (Op2 b (Var s) a)))) m), (snd (eval m (Op2 b (Var s) a))))
 -- eval [("$1", "10")] (Accum Add "$1" (Lit (Num 1))) // Deberia Guardar 11 y devolver 11
 
 -- DEFINIMOS LAS PP ----------------------------------------------------------------------------------------------------------
-eval m (PP True True s) = (addElem (s, show (snd (eval m (Op2 Add (Var s) (Lit 1))))) m, snd (eval m (Op2 Add (Var s) (Lit 1))))
-eval m (PP False True s) =  (addElem (s, show (snd (eval m (Op2 Add (Var s) (Lit 1))))) m, snd (eval m (Var s)))
-eval m (PP True False s) = (addElem (s, show (snd (eval m (Op2 Add (Var s) (Lit (-1)))))) m, snd (eval m (Op2 Add (Var s) (Lit (-1)))))
-eval m (PP False False s) =  (addElem (s, show (snd (eval m (Op2 Add (Var s) (Lit (-1)))))) m, snd (eval m (Var s)))
+eval m (PP True True s) = (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit 1))))) m, snd (eval m (Op2 Add (Var s) (Lit 1))))
+eval m (PP False True s) =  (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit 1))))) m, snd (eval m (Var s)))
+eval m (PP True False s) = (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit (-1)))))) m, snd (eval m (Op2 Add (Var s) (Lit (-1)))))
+eval m (PP False False s) =  (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit (-1)))))) m, snd (eval m (Var s)))
 -- eval [("$1", "10")] (PP False False "$1") // Deberia guardar 9 y devolver 10
 
 
@@ -91,8 +92,10 @@ eval m (PP False False s) =  (addElem (s, show (snd (eval m (Op2 Add (Var s) (Li
 -- eval [("1", "Pepito")] (Op2 Equal (Lit (Str "")) (Lit ( Str ""))) 
 -- eval [("1", "Pepito")] (Op2 Equal (Var "1") (Lit ( Str "Pepito")))
 
--- *Eval> eval [("1", "Pepito")] (Lit 1)
--- ([("1","Pepito")],1)
--- *Eval> eval [("1", "Pepito")] (Var "1")
--- ([("1","Pepito")],Pepito)
--- *Eval>
+-- *Eval> eval [("1", "Pepito")] (Lit 1) // ([("1","Pepito")],1)
+-- *Eval> eval [("1", "Pepito")] (Var "1") // ([("1","Pepito")],Pepito)
+
+
+
+
+
