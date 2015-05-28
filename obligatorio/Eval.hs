@@ -97,9 +97,10 @@ eval m (PP False False s) =  (Map.insert s (show (snd (eval m (Op2 Add (Var s) (
 -- *Eval> eval [("1", "Pepito")] (Var "1") // ([("1","Pepito")],Pepito)
 
 
-toString :: Maybe a -> String
-toString Nothing s = ""
-toString Just s = s
+toString :: Maybe String -> String
+toString maybeValue = case maybeValue of
+  Just value -> value
+  Nothing    -> ""
 
 
 
