@@ -3,13 +3,14 @@ module Eval (eval) where
 import AwkiSA
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Maybe 
 
-eval :: Map -> Expr -> (Map, Valor)
+eval :: Map String String -> Expr -> (Map String String, Valor)
 
 -- DEFINIMOS LA EVALUACION DE LAS EXPESIONES ATOMICAS ------------------------------------------------------------------------
 eval m (Lit v) = (m, v)
 
-eval m (Var s) = (m, Str (Map.lookup s m))
+eval m (Var s) = (m, Str (toString (Map.lookup s m)))
 
 -- DEFINIMOS LAS EXPRESIONES DE LAS OPERACIONES DOS PARAMETROS ---------------------------------------------------------------
 eval m (Op2 Add a b) = (m, (snd (eval m a)) + (snd (eval m b))) -- FUNCIONA PORQUE Valor implementa Num
@@ -20,11 +21,11 @@ eval m (Op2 Mul a b) = (m, (snd (eval m a)) * (snd (eval m b))) -- FUNCIONA PORQ
 
 eval m (Op2 Div a b) 
 	| (toInt (snd (eval m b))) /= 0 = (m, Num (div  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
-	| otherwise = Map.insert "errorFlag" (Str "ERROR: DIVISION POR 0") m 
+	| otherwise = (Map.insert "errorFlag" "ERROR: DIVISION POR 0" m, (Num 0))
 	
 eval m (Op2 Mod a b) 
 	| (toInt (snd (eval m b))) /= 0 = (m, Num (mod  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
-	| otherwise = Map.insert "errorFlag" (Str "ERROR: DIVISION POR 0") m
+	| otherwise = (Map.insert "errorFlag" "ERROR: DIVISION POR 0" m, (Num 0))
 
 -- VER ALGUN EJEMPLO COMO HIZO EL RESTO CON EL TEMA DE LAS COMPARACIONES, QUE DEVUELVEN?
 eval m (Op2 Lt a b) 
@@ -96,6 +97,9 @@ eval m (PP False False s) =  (Map.insert s (show (snd (eval m (Op2 Add (Var s) (
 -- *Eval> eval [("1", "Pepito")] (Var "1") // ([("1","Pepito")],Pepito)
 
 
+toString :: Maybe a -> String
+toString Nothing s = ""
+toString Just s = s
 
 
 
