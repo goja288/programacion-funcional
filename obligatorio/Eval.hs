@@ -103,4 +103,5 @@ toString maybeValue = case maybeValue of
   Nothing    -> ""
 
 
-
+evalError :: Map String String -> Bool
+evalError m = Map.member "errorFlag" m 
