@@ -5,6 +5,9 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe 
 
+-- Este modulo tiene como funcionalidad la evaluacion de una expresion.
+
+
 eval :: Map String String -> Expr -> (Map String String, Valor)
 
 -- DEFINIMOS LA EVALUACION DE LAS EXPESIONES ATOMICAS ------------------------------------------------------------------------
@@ -14,7 +17,7 @@ eval m (Lit v)
 
 eval m (Var s)
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (m, Str (toString (Map.lookup s m)))
+	| otherwise = (m, Str (toString (Map.lookup s m))) ----- VER ????????????????????????????????????????????????????????????????????????
 
 -- DEFINIMOS LAS EXPRESIONES DE LAS OPERACIONES DOS PARAMETROS ---------------------------------------------------------------
 eval m (Op2 Add a b)
@@ -29,7 +32,7 @@ eval m (Op2 Mul a b)
 	| evalError m  == True = (m, (Num 0))
 	| otherwise = (m, (snd (eval m a)) * (snd (eval m b))) -- FUNCIONA PORQUE Valor implementa Num
 
-eval m (Op2 Div a b) 
+eval m (Op2 Div a b)
 	| evalError m  == True = (m, (Num 0))
 	| (toInt (snd (eval m b))) /= 0 = (m, Num (div  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
 	| otherwise = (Map.insert "errorFlag" "ERROR: DIVISION POR 0" m, (Num 0))
@@ -129,9 +132,13 @@ eval m (PP False False s)
 	| otherwise =  (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit (-1)))))) m, snd (eval m (Var s)))
 -- eval (Map.fromList [("$1", "10")]) (PP False False "$1") // Deberia guardar 9 y devolver 10
 
-
+-- DEFINIMOS LA EXPESION "FIELD EXPR" ------------------------------------------------------------------------------------------
+eval m (Field a)
+	| evalError m  == True = (m, (Num 0))
+	| otherwise = (eval m (Var (show (snd((eval m a))))))
 	
--- PRUEBAS ...............................................................
+	
+-- PRUEBAS ............................................................................
 -- eval (Map.fromList [("1", "Pepito")]) (Op2 Equal (Lit (Str "")) (Lit ( Str ""))) 
 -- eval (Map.fromList [("1", "Pepito")]) (Op2 Equal (Var "1") (Lit ( Str "Pepito")))
 
