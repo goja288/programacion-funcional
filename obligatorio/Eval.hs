@@ -22,114 +22,256 @@ eval m (Var s)
 -- DEFINIMOS LAS EXPRESIONES DE LAS OPERACIONES DOS PARAMETROS ---------------------------------------------------------------
 eval m (Op2 Add a b)
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (m, (snd (eval m a)) + (snd (eval m b))) -- FUNCIONA PORQUE Valor implementa Num
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| otherwise = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, (snd dupla1) + (snd dupla2))
 
 eval m (Op2 Sub a b) 
 	| evalError m  == True = (m, (Num 0)) 
-	| otherwise = (m, (snd (eval m a)) - (snd (eval m b))) -- FUNCIONA PORQUE Valor implementa Num
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| otherwise = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, (snd dupla1) - (snd dupla2))
 
 eval m (Op2 Mul a b) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (m, (snd (eval m a)) * (snd (eval m b))) -- FUNCIONA PORQUE Valor implementa Num
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| otherwise = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, (snd dupla1) * (snd dupla2))
 
 eval m (Op2 Div a b)
 	| evalError m  == True = (m, (Num 0))
-	| (toInt (snd (eval m b))) /= 0 = (m, Num (div  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
-	| otherwise = (Map.insert "-1" "awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n" m, (Num 0))
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| (toInt (snd (eval m b))) /= 0 = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num (div  (toInt (snd dupla1)) (toInt (snd dupla2))))
+	| otherwise = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (Map.insert "-1" "awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n" (fst dupla2), (Num 0))
 	
 eval m (Op2 Mod a b)
 	| evalError m  == True = (m, (Num 0))
-	| (toInt (snd (eval m b))) /= 0 = (m, Num (mod  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
-	| otherwise = (Map.insert "-1" "awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n" m, (Num 0))
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b	
+	| (toInt (snd (eval m b))) /= 0 = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num (mod  (toInt (snd dupla1)) (toInt (snd dupla2))))
+	| otherwise = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (Map.insert "-1" "awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n" (fst dupla2), (Num 0))
 
 -- VER ALGUN EJEMPLO COMO HIZO EL RESTO CON EL TEMA DE LAS COMPARACIONES, QUE DEVUELVEN?
 eval m (Op2 Lt a b) 
 	| evalError m  == True = (m, (Num 0))
-	| (snd (eval m a)) < (snd (eval m b)) = (m, Num 1)
-	| otherwise = (m, Num 0)
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| (snd (eval m a)) < (snd (eval (fst (eval m a)) b)) = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 1)
+	| otherwise =
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 0)
 	
 eval m (Op2 Gt a b) 
 	| evalError m  == True = (m, (Num 0))
-	| (snd (eval m a)) > (snd (eval m b)) = (m, Num 1)
-	| otherwise = (m, Num 0)
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval (fst (eval m a)) a)) b
+	| (snd (eval m a)) > (snd (eval (fst (eval m a)) b)) = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 1)
+	| otherwise =
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 0)
 	
 eval m (Op2 Le a b)
 	| evalError m  == True = (m, (Num 0))
-	| (snd (eval m a)) <= (snd (eval m b)) = (m, Num 1)
-	| otherwise = (m, Num 0)
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval (fst (eval m a)) a)) b
+	| (snd (eval m a)) <= (snd (eval (fst (eval m a)) b)) = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 1)
+	| otherwise =
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 0)
 	
 eval m (Op2 Ge a b) 
 	| evalError m  == True = (m, (Num 0))
-	| (snd (eval m a)) >= (snd (eval m b)) = (m, Num 1)
-	| otherwise = (m, Num 0)
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval (fst (eval m a)) a)) b
+	| (snd (eval m a)) >= (snd (eval (fst (eval m a)) b)) = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 1)
+	| otherwise =
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 0)
 
 eval m (Op2 Ne a b) 
 	| evalError m  == True = (m, (Num 0))
-	| (snd (eval m a)) /= (snd (eval m b)) = (m, Num 1)
-	| otherwise = (m, Num 0)
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| (snd (eval m a)) /= (snd (eval (fst (eval m a)) b)) = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 1)
+	| otherwise =
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 0)
 
 eval m (Op2 Equal a b) 
 	| evalError m  == True = (m, (Num 0))
-	| (snd (eval m a)) == (snd (eval m b)) = (m, Num 1)
-	| otherwise = (m, Num 0)
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| (snd (eval m a)) == (snd (eval (fst (eval m a)) b)) = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 1)
+	| otherwise =
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 0)
 
 eval m (Op2 And a b)
 	| evalError m  == True = (m, (Num 0))
-	| (toBool (snd (eval m a))) && (toBool (snd (eval m b))) = (m, Num 1)
-	| otherwise = (m, Num 0)
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| (toBool (snd (eval m a))) && (toBool (snd (eval (fst (eval m a)) b))) = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 1)
+	| otherwise =
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 0)
 
 eval m (Op2 Or a b)
 	| evalError m  == True = (m, (Num 0))
-	| (toBool (snd (eval m a))) || (toBool (snd (eval m b))) = (m, Num 1)
-	| otherwise = (m, Num 0)
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b	
+	| (toBool (snd (eval m a))) || (toBool (snd (eval (fst (eval m a)) b))) = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 1)
+	| otherwise =
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Num 0)
 	
 eval m (Op2 Concat a b) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (m,  Str (concat [show (snd (eval m a)), show (snd (eval m b))]))
+	| evalError (fst (eval m a)) == True = eval m a
+	| evalError (fst (eval m b)) == True = eval (fst (eval m a)) b	
+	| otherwise = 
+		let 
+		dupla1 = eval m a
+		dupla2 = eval (fst dupla1) b
+		in (fst dupla2, Str (concat [show (snd dupla1), show (snd dupla2)]))
 
 -- DEFINIMOS LAS EXPRESIONES DE LAS OPERACIONES UN PARAMETRO -----------------------------------------------------------------
 eval m (Op1 Plus a) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (m, snd (eval m a))
+	| otherwise = eval m a
 
 eval m (Op1 Minus a) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (m, ((snd (eval m a)) * (-1)))
+	| evalError (fst (eval m a)) == True = eval m a
+	| otherwise = (fst (eval m a), ((snd (eval m a)) * (-1)))
 
 eval m (Op1 Not a)
 	| evalError m  == True = (m, (Num 0))
-	| toBool (snd (eval m a)) == False = (m, Num 1)
-	| otherwise = (m, Num 0)	
+	| evalError (fst (eval m a)) == True = eval m a
+	| toBool (snd (eval m a)) == False = (fst (eval m a), Num 1)
+	| otherwise = (fst (eval m a), Num 0)	
 -- eval (Map.fromList [("$1", "10")]) (Op1 Not (Op2 Gt (Var "$1") (Lit (Num 1))))
 -- eval (Map.fromList [("$1", "10")]) (Op1 Not (Op2 Lt (Var "$1") (Lit (Num 1))))
 
 -- DEFINIMOS LAS ASIGNACIONES DE VARIABLES -----------------------------------------------------------------------------------
 eval m (Assign s a) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (Map.insert s (show (snd (eval m a))) m, snd (eval m a))
+	| evalError (fst (eval m a)) == True = eval m a
+	| otherwise = let dupla = eval m a
+				in if (evalError (fst dupla)) then
+					dupla
+				else
+					(Map.insert s (show (snd dupla)) (fst dupla), snd dupla)
 
 -- DEFINIMOS LAS ACUMULACIONES -----------------------------------------------------------------------------------------------
 eval m (Accum b s a) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = ((Map.insert s (show (snd (eval m (Op2 b (Var s) a)))) m), (snd (eval m (Op2 b (Var s) a))))
+	| evalError (fst (eval m a)) == True = eval m a
+	| otherwise = 
+		let dupla1 = eval m (Op2 b (Var s) a)
+		in (Map.insert s (show (snd (dupla1))) (fst dupla1), (snd dupla1))
 -- eval (Map.fromList [("$1", "10")]) (Accum Add "$1" (Lit (Num 1))) // Deberia Guardar 11 y devolver 11
 
 -- DEFINIMOS LAS PP ----------------------------------------------------------------------------------------------------------
 eval m (PP True True s) 
 	| evalError m  == True = (m, (Num 0)) 
-	| otherwise = (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit 1))))) m, snd (eval m (Op2 Add (Var s) (Lit 1))))
+	| otherwise = 
+		let dupla1 = eval m (Op2 Add (Var s) (Lit 1))
+		in (Map.insert s (show (snd dupla1)) (fst dupla1), snd dupla1)
 	
 eval m (PP False True s) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise =  (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit 1))))) m, snd (eval m (Var s)))
+	| otherwise =  
+		let dupla1 = eval m (Op2 Add (Var s) (Lit 1)) 
+		in (Map.insert s (show (snd dupla1)) (fst dupla1), snd (eval m (Var s)))
 	
 eval m (PP True False s) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit (-1)))))) m, snd (eval m (Op2 Add (Var s) (Lit (-1)))))
+	| otherwise = 
+		let dupla1 = eval m (Op2 Add (Var s) (Lit (-1)))
+		in (Map.insert s (show (snd dupla1)) (fst dupla1), snd dupla1)
 	
 eval m (PP False False s) 
 	| evalError m  == True = (m, (Num 0))
-	| otherwise =  (Map.insert s (show (snd (eval m (Op2 Add (Var s) (Lit (-1)))))) m, snd (eval m (Var s)))
+	| otherwise =
+		let dupla1 = eval m (Op2 Add (Var s) (Lit (-1)))
+		in (Map.insert s (show (snd dupla1)) (fst dupla1), snd (eval m (Var s)))
 -- eval (Map.fromList [("$1", "10")]) (PP False False "$1") // Deberia guardar 9 y devolver 10
 
 -- DEFINIMOS LA EXPESION "FIELD EXPR" ------------------------------------------------------------------------------------------

@@ -40,7 +40,7 @@ execute m (Print l) s
 	| evalError m  == True = (m, s)
 	| otherwise = let hayError = execute' m (Print l) ""
 				in if ((snd hayError) /= "") then
-						(m, s ++ (snd hayError))
+						((fst hayError), s ++ (snd hayError))
 					else
 						execute'' m (Print l) s
 
@@ -150,7 +150,7 @@ execute' m (Print l) s
 						execute' (fst dupla) (Print (tail l)) s
 	| otherwise = let dupla = (eval m (head l))
 				in if ((evalError (fst dupla)) == True) then
-						((fst dupla), (fst dupla) Map.! "-1'")
+						((fst dupla), (fst dupla) Map.! "-1")
 					else 
 						((fst dupla), "")
 
