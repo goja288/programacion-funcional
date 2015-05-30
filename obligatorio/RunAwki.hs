@@ -6,77 +6,111 @@ import Memoria
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-
+import Parser
+import Eval
+import Execute
 
 runAwki :: AwkiProg -> String -> String
-runAwki awkiprog entrada = do
+runAwki awkiProg entrada = do
 
-
-	-- INICIALIZACION
-	let m = Map.fromList [("NR",show 0)]
+	-- Tomo la entrada y la separo por lineas
 	let lineas = lines entrada
 
+	-- Ordeno el AwkiProg (BEGIN's al ppio, END's al final y el resto en el medio)
+	let awkiProgOrdenado = ordenarAwkiProg awkiProg
 
-	-- FIN INICIALIZACION
-	let m1 = runAwkiIter awkiprog (lineas !! 0) m
+	-- Inicializo la memoria 
+	let memoria = Map.fromList [("NR",show 0),("NF",show 0)]
 
-	-- ORDENAR EL AWKIPROG (poner los begins y ends en orden)
-	
-	-- Para cada linea de la entrada ejecutar lo que sigue
-
-
-		-- FALTA UN LOOP POR LINEA 
-		-- cargarVariablesAutomaticas  entrada (Map.fromList [("g","j")])
-
-	-- imprimirMap m1
-
-	let p1 = AwkiProg [(END,Empty),(BEGIN,Empty),(BEGIN,Empty),(BEGIN,Empty),(Pat (Lit (Num 1)),Empty)]
-	let p2 = ordenarAwkiProg p1
-	
-	let pepe = length (awkiProgToList p2)
-
-	--let abu = BEGIN == BEGIN
-	--show abu
-	-- "asdasdasd"
-	show pepe
-
-
---	entrada (putStrLn "awkiprog")
-
-
-
-	-- AwkiProg.Patron
-		-- if (typeOf(AwkiProg.Patron p) ==  Expr) {
-			-- bool b = eval p m
-			-- if (b == true && noError) { 
-				-- ejecuta el statement 
-			-- }
-		-- }
-		-- else (typeOf(AwkiProg.Patron p) ==  BEGIN) {
-		-- 	VER
-		-- }
-		-- else (typeOf(AwkiProg.Patron p) ==  END) {
-			-- VER 
+	let salida = "ESTA ES LA SALIDA "
+    
+    -- Para cada linea de la entrada {
+    	-- Para cada regla (patron,accion) del programa {
+        	-- if cumple patron
+                -- then ejecutar accion sobre linea
 		-- } 
+	-- }
+	let res = procesarLinea awkiProgOrdenado salida lineas 0 memoria
+
+	snd res
 
 
-	-- ANTES DE VOLVER AL LOOP BORRO EL MAP CON CUIDADO, 
+-- 
+procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String String -> (Map String String,String)
+procesarLinea awp salida lineas indice memoria = do
+	
+	if (indice < length lineas) then do
 		
+		let linea = (lineas !! indice) 
+		let listaPatronAccion = awkiProgToList awp
+		if (not(Map.member "-1" memoria)) then do 
+			let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
+			if (Map.member "-1" (fst res)) then do 
+				-- ERROR
+				(fst res,salida)
+			else do 
+				let indiceInc = indice + 1 
+				procesarLinea awp salida lineas indiceInc (fst res)
+		else do
+			(memoria,salida)
+	else do
+		(memoria,salida)
 
 
--- runAwki (AwkiProg [(BEGIN,Empty)]) _ = "ola no es lo mismo que Hola"
--- '{ print }'
--- runAwki ( AwkiProg [(Pat (Lit 1),Sequence [Print [Field (Lit 0)]])] ) a = a -- '{ print }'
+-- recorrerPatronStatement :: [(Patron,Statement)] -> [(Patron,Statement)]
+-- recorrerPatronStatement lista = map aux2 
 
--- runAwki _ _ = "a bu"
 
-----
--- runAwki _ =  unlines .  map ("prueba" ++)  . lines
----
+aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
+aux2 memoria linea salida (BEGIN,st) = (memoria,salida)
+aux2 memoria linea salida (END,st) = (memoria,salida)
+aux2 memoria linea salida (Pat e,st) = do
+	let dupla = eval memoria e -- -> (Map String String, Valor)
+	let resExpr = toBool (snd dupla)
+	
+	-- SI HAY ERROR PREGUNTANDO POR LA FLAG LO AGREGO AL STRING DE SALIDA
+	if (Map.member "-1" (fst dupla)) then do
+		(fst dupla, salida ++ ( (fst dupla) Map.! "-1"))
+	else if (resExpr == True) then do
+		-- EJECUTAR STATEMENT linea
+		(execute (fst dupla) st salida) 
+	else do
+		(memoria,salida)
+		
+---------
 
+
+-- AwkiProg como lista
+-- String de entrada
+-- Memoria inicial
+-- 
 -- Devuelve la memoria con NR incrementado
-runAwkiIter :: AwkiProg -> String -> Map String String -> Map String String
-runAwkiIter awp str m = Map.insert "$1" "esto es una var" m 
+--runAwkiIter :: AwkiProg -> [String] -> Num -> Map String String -> Map String String
+--runAwkiIter awp lineas indice m = do
+	
+--	let awpList = awkiProgToList awp -- Lo paso a lista
+--
+--	map (aux) 
+
+--	Map.insert "$1" "esto es una var" m 
+
+	-- print varAutomaticas3
+
+
+
+
+-- AwkiProg como lista
+-- String de entrada
+-- Memoria inicial
+-- 
+-- Devuelve la memoria con NR incrementado
+--runAwkiIter :: [(Patron,Statement)] -> String -> Map String String -> Map String String
+--runAwkiIter awp str m = do
+
+
+--	Map.insert "$1" "esto es una var" m 
+
+--	run 
 	-- print varAutomaticas3
 
 	
@@ -137,16 +171,16 @@ juntarDupla (a,b) = a ++ "\t" ++b
 -- Con los BEGIN AL PRINCIPIO Y 
 ordenarAwkiProg :: AwkiProg -> AwkiProg 
 --ordenarAwkiProg :: AwkiProg -> [(Patron,Statement)]
-ordenarAwkiProg xs = AwkiProg (( (filter f' (awkiProgToList xs))) ++ ( (filter f'' (awkiProgToList xs))) ++ ( (filter f''' (awkiProgToList xs))))
+ordenarAwkiProg xs = AwkiProg (( (filter esBegin (awkiProgToList xs))) ++ ( (filter esExpr (awkiProgToList xs))) ++ ( (filter esEnd (awkiProgToList xs))))
 
-f' :: (Patron,Statement) -> Bool
-f' (a,b) = (a == BEGIN)
+esBegin :: (Patron,Statement) -> Bool
+esBegin (a,b) = (a == BEGIN)
 
-f'' :: (Patron,Statement) -> Bool
-f'' (a,b) = (a /= BEGIN && a /= END)
+esExpr :: (Patron,Statement) -> Bool
+esExpr (a,b) = (a /= BEGIN && a /= END)
 
-f''' :: (Patron,Statement) -> Bool
-f''' (a,b) = (a == END)
+esEnd :: (Patron,Statement) -> Bool
+esEnd (a,b) = (a == END)
 
 --ordenarAwkiProg (AwkiProg []) = (AwkiProg [])
 --ordenarAwkiProg (AwkiProg ((x,y):xs)) 
@@ -168,3 +202,4 @@ patronEq _ _ = False
 
 instance Eq Patron where
   a == b = patronEq a b
+
