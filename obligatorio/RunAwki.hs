@@ -46,7 +46,7 @@ procesarLinea awp salida lineas indice memoria = do
 		let listaPatronAccion = awkiProgToList awp
 		if (not(Map.member "-1" memoria)) then do 
 			
-			let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
+			let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [(Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
 			
 			if (Map.member "-1" (fst res)) then do 
 		--		-- ERROR
