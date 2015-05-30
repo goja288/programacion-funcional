@@ -21,7 +21,11 @@ execute m Empty s
 -- Simple Expr
 execute m (Simple a) s
 	| evalError m  == True = (m, s)
-	| otherwise = (fst (eval m a), s)
+	| otherwise = let dupla = eval m a
+				in if (evalError (fst dupla)) then 
+						(fst dupla, s ++ ((fst dupla) Map.! "-1"))
+					else
+						((fst dupla), show (snd dupla))
 
 
 
@@ -78,7 +82,11 @@ execute m (If a st1 st2) s
 
 
 -- For Expr Expr Expr Statment
---execute 
+-- execute m (For a1 a2 a3 Statment) s
+--	| evalError m  == True = (m, s) 
+--	| otherwise = let dupla1 = eval m a1
+--					  dupla2 = if (evalError (fst dupla1)) then
+--					  				(m, s ++ ((fst dupla) Map.! "-1"))
 
 
 
@@ -158,3 +166,10 @@ execute'' m (Print l) s
 	| otherwise = let dupla = (eval m (head l)) 
 				in (fst dupla, s ++ (show (snd dupla)) ++ "\n")
 
+
+-- execute''' :: Map String String -> Expr -> Expr -> Statment -> String -> (Map String String, String)
+-- execute' m a2 a3 st s
+--	| evalError m  == True = (m, s) 
+--	| otherwise = let dupla1 = eval m a2
+--					  dupla2 = if (evalError (fst dupla1)) then
+--					  				(m, s ++ ((fst dupla) Map.! "-1"))
