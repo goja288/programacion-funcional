@@ -22,7 +22,7 @@ runAwki awkiProg entrada = do
 	-- Inicializo la memoria 
 	let memoria = Map.fromList [("NR",show 0),("NF",show 0)]
 
-	let salida = "ESTA ES LA SALIDA "
+	-- let salida = "ESTA ES LA SALIDA \n"
     
     -- Para cada linea de la entrada {
     	-- Para cada regla (patron,accion) del programa {
@@ -30,31 +30,35 @@ runAwki awkiProg entrada = do
                 -- then ejecutar accion sobre linea
 		-- } 
 	-- }
-	let res = procesarLinea awkiProgOrdenado salida lineas 0 memoria
+	let res = procesarLinea awkiProgOrdenado "#1#" lineas 0 memoria
 
-	snd res
-
+	let a = (snd res)
+	a
+	
 
 -- 
 procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String String -> (Map String String,String)
 procesarLinea awp salida lineas indice memoria = do
 	
-	if (indice < length lineas) then do
+	if (indice < (length lineas)) then do
 		
 		let linea = (lineas !! indice) 
 		let listaPatronAccion = awkiProgToList awp
 		if (not(Map.member "-1" memoria)) then do 
+			
 			let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
+			
 			if (Map.member "-1" (fst res)) then do 
-				-- ERROR
-				(fst res,salida)
-			else do 
+		--		-- ERROR
+				(fst res,(snd res) ++ "#2#")
+			else do
 				let indiceInc = indice + 1 
-				procesarLinea awp salida lineas indiceInc (fst res)
+				procesarLinea awp (snd res) lineas indiceInc (fst res)
+				-- (memoria,salida ++ "#2.5#")
 		else do
-			(memoria,salida)
+			(memoria,salida ++ "#3#")
 	else do
-		(memoria,salida)
+		(memoria,salida ++ "#4#")
 
 
 -- recorrerPatronStatement :: [(Patron,Statement)] -> [(Patron,Statement)]
@@ -62,8 +66,8 @@ procesarLinea awp salida lineas indice memoria = do
 
 
 aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
-aux2 memoria linea salida (BEGIN,st) = (memoria,salida)
-aux2 memoria linea salida (END,st) = (memoria,salida)
+aux2 memoria linea salida (BEGIN,st) = (memoria,salida ++ "#5#")
+aux2 memoria linea salida (END,st) = (memoria,salida ++ "#6#")
 aux2 memoria linea salida (Pat e,st) = do
 	let dupla = eval memoria e -- -> (Map String String, Valor)
 	let resExpr = toBool (snd dupla)
@@ -73,9 +77,11 @@ aux2 memoria linea salida (Pat e,st) = do
 		(fst dupla, salida ++ ( (fst dupla) Map.! "-1"))
 	else if (resExpr == True) then do
 		-- EJECUTAR STATEMENT linea
-		(execute (fst dupla) st salida) 
+		(execute (fst dupla) st (salida ++ "#7#") ) 
+		-- (fst t1,(snd t1) ++ "#7.5#")
 	else do
-		(memoria,salida)
+		(memoria,salida ++ "#8#")
+		
 		
 ---------
 
