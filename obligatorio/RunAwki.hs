@@ -11,109 +11,82 @@ import Eval
 import Execute
 
 runAwki :: AwkiProg -> String -> String
-runAwki awkiProg entrada = do
-
-	-- Inicializo la memoria 
-	let memoria = Map.fromList [("NR",show 0),("NF",show 0),("-3",show 0)]
-
-	-- Tomo la entrada y la separo por lineas
-	let lineas = lines entrada
-
-	-- Ordeno el AwkiProg (BEGIN's al ppio, END's al final y el resto en el medio) - NO TIENE MUCHO SENTIDO AHORA
-	let awkiProgOrdenado = ordenarAwkiProg awkiProg
-
-	-- BEGIN
-	let awpBEGIN = AwkiProg ( (filter esBegin (awkiProgToList awkiProgOrdenado)))
-	let resBEGIN = procesarBeginsEnds awpBEGIN ("") memoria
-
-	-- EXPR
-	let awpEXPR = AwkiProg ( (filter esExpr (awkiProgToList awkiProgOrdenado)))
-	let resEXPR = procesarLinea awpEXPR (snd resBEGIN) lineas 0 (fst resBEGIN)
-
-	-- END
-	let awpEND = AwkiProg ( (filter esEnd (awkiProgToList awkiProgOrdenado)))
-	let resEND = procesarBeginsEnds awpEND (snd resEXPR) (fst resEXPR) 
-
-	-- Obtenglo los BEGINS
-
-
-	-- let salida = "ESTA ES LA SALIDA \n"
-    
-    -- Para cada linea de la entrada {
-    	-- Para cada regla (patron,accion) del programa {
-        	-- if cumple patron
-                -- then ejecutar accion sobre linea
-		-- } 
-	-- }
-
-	let a = (snd resEND)
-	a
+runAwki awkiProg entrada = 
+	let 
+	memoria = Map.fromList [("NR",show 0),("NF",show 0),("-3",show 0)] -- Inicializo la memoria 
+	lineas = lines entrada -- Tomo la entrada y la separo por lineas
+	awkiProgOrdenado = ordenarAwkiProg awkiProg 	-- Ordeno el AwkiProg (BEGIN's al ppio, END's al final y el resto en el medio) - NO TIENE MUCHO SENTIDO AHORA
+	awpBEGIN = AwkiProg ( (filter esBegin (awkiProgToList awkiProgOrdenado)))	-- BEGIN
+	resBEGIN = procesarBeginsEnds awpBEGIN ("") memoria
+	awpEXPR = AwkiProg ( (filter esExpr (awkiProgToList awkiProgOrdenado)))	-- EXPR
+	resEXPR = procesarLinea awpEXPR (snd resBEGIN) lineas 0 (fst resBEGIN)
+	awpEND = AwkiProg ( (filter esEnd (awkiProgToList awkiProgOrdenado))) -- END
+	resEND = procesarBeginsEnds awpEND (snd resEXPR) (fst resEXPR) -- END
+	in (snd resEND)
 
 ----
 -- procesarBeginsEnds
 ----
 procesarBeginsEnds :: AwkiProg -> String -> Map String String -> (Map String String,String)
-procesarBeginsEnds awp salida memoria = do
-
-		let listaPatronAccion = awkiProgToList awp
-		if (not(Map.member "-1" memoria)) then do 			
+procesarBeginsEnds awp salida memoria =
+		let 
+		listaPatronAccion = awkiProgToList awp
+		in if (not(Map.member "-1" memoria)) then
 			-- let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
-			recorrerPatronStatement memoria "" listaPatronAccion salida
-		else do
-			(memoria,salida)
+				recorrerPatronStatement memoria "" listaPatronAccion salida
+			else
+				(memoria,salida)
 ----
 -- END procesarBeginsEnd
 ----
 
 -- 
 procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String String -> (Map String String,String)
-procesarLinea awp salida lineas indice memoria = do
-
-	if (indice < (length lineas)) then do
-		
-		let linea = (lineas !! indice) 
-		let campos = words linea
-		let nr = indice
-  		let nf = length campos
+procesarLinea awp salida lineas indice memoria 
+	| (indice >= (length lineas)) = (memoria, salida)
+	| otherwise = 
+		let
+		linea = (lineas !! indice) 
+		campos = words linea
+		nr = indice
+  		nf = length campos
   
-  		let duplaMemoriaNfAnterior = aux3 memoria 
-  		let memoria = duplaMemoriaNfAnterior
-  		let nfAnterior = show nf	
+  		duplaMemoriaNfAnterior = aux3 memoria 
+  		memoria1 = duplaMemoriaNfAnterior
+  		nfAnterior = show nf	
 
-		let memoriaConCampos = agregarVariablesCampos campos 1  memoria 
-		let memoria = memoriaConCampos 
+		memoriaConCampos = agregarVariablesCampos campos 1  memoria1
+		memoria2 = memoriaConCampos 
 
-		let memoriaAux = Map.insert "0" (linea) memoria
-		let memoria = memoriaAux -- Como forzar haskel :S
+		memoriaAux = Map.insert "0" (linea) memoria2
+		memoria3 = memoriaAux -- Como forzar haskel :S
 
   		-- El -3 guarda la linea anterior
   		-- let varAutomaticas = [("NR",show indice),("NF",show (length (words linea))),("-3",nfAnterior),("0",linea)]
 
   		-- actualizo nr y nf y -3
-  		let indiceInc = indice + 1 
-  		let memoriaNR = Map.insert "NR" (show indiceInc) memoria
-  		let memoriaNF = Map.insert "NF" (show (length (words linea))) memoriaNR
-  		let memoriaMenos3 = Map.insert "-3" nfAnterior memoriaNF
-  		let memoria = Map.insert "0" linea memoriaMenos3
+  		indiceInc = indice + 1 
+  		memoriaNR = Map.insert "NR" (show indiceInc) memoria3
+  		memoriaNF = Map.insert "NF" (show (length (words linea))) memoriaNR
+  		memoriaMenos3 = Map.insert "-3" nfAnterior memoriaNF
+  		memoria4 = Map.insert "0" linea memoriaMenos3
 
 		
-		let listaPatronAccion = awkiProgToList awp
-		if (not(Map.member "-1" memoria)) then do 
-			
+		listaPatronAccion = awkiProgToList awp
+		in if (not(Map.member "-1" memoria4)) then			
 			-- let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
-			let res = recorrerPatronStatement memoria linea listaPatronAccion salida
-
-			if (Map.member "-1" (fst res)) then do 
+			let 
+			res = recorrerPatronStatement memoria4 linea listaPatronAccion (salida)
+			in if (Map.member "-1" (fst res)) then
 		--		-- ERROR
-				(fst res,(snd res))
-			else do
-				let indiceInc = indice + 1 
-				procesarLinea awp (snd res) lineas indiceInc (fst res)
+					(fst res,(snd res))
+				else
+					let indiceInc = indice + 1 
+					in procesarLinea awp (snd res) lineas indiceInc (fst res)
 				-- (memoria,salida ++ "#2.5#")
-		else do
-			(memoria,salida)
-	else do
-		(memoria,salida)
+			else
+				(memoria4,salida)
+
 
 
 agregarVariablesCampos :: [String] -> Int -> Map String String -> Map String String
@@ -132,35 +105,41 @@ recorrerPatronStatement memoria linea awkiList salida
 				if (evalError (fst dupla) == True) then 
 					dupla
 				else
-					recorrerPatronStatement (fst dupla) linea (tail awkiList) (snd dupla)
+					recorrerPatronStatement (fst dupla) linea (tail awkiList) (snd dupla)	
+	| length awkiList == 1 = aux2 memoria linea salida (head awkiList)
 	| length awkiList == 0 = (memoria,salida)
-	| otherwise = aux2 memoria linea salida (head awkiList)
+
 
 
 aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
 aux2 memoria linea salida (BEGIN,st) = 
-	if (Map.member "-1" memoria) then do
+	if (Map.member "-1" memoria) then
 		(memoria,salida)
-	else do
+	else
 		(execute memoria st (salida))
+
 aux2 memoria linea salida (END,st) =  
-	if (Map.member "-1" memoria) then do
+	if (Map.member "-1" memoria) then
 		(memoria,salida)
-	else do
+	else
 		(execute memoria st (salida))
-aux2 memoria linea salida (Pat e,st) = do
-	let dupla = eval memoria e -- -> (Map String String, Valor)
-	let resExpr = toBool (snd dupla)
+
+aux2 memoria linea salida (Pat e,st) =
+	let 
+	dupla = eval memoria e -- -> (Map String String, Valor)
+	resExpr = toBool (snd dupla)
 	
+	in 
 	-- SI HAY ERROR PREGUNTANDO POR LA FLAG LO AGREGO AL STRING DE SALIDA
-	if (Map.member "-1" (fst dupla)) then do
+	if (Map.member "-1" (fst dupla)) then
 		(fst dupla, salida ++ ( (fst dupla) Map.! "-1"))
-	else if (resExpr == True) then do
-		-- EJECUTAR STATEMENT linea
-		(execute (fst dupla) st (salida) ) 
-		-- (fst t1,(snd t1) ++ "#7.5#")
-	else do
-		(memoria,salida)
+	else 
+		if (resExpr == True) then
+			-- EJECUTAR STATEMENT linea
+			(execute (fst dupla) st (salida) ) 
+			-- (fst t1,(snd t1) ++ "#7.5#")
+		else
+			(fst dupla,salida)
 	
 
 aux3 :: Map String String -> Map String String

@@ -277,7 +277,8 @@ eval m (PP False False s)
 -- DEFINIMOS LA EXPESION "FIELD EXPR" ------------------------------------------------------------------------------------------
 eval m (Field a)
 	| evalError m  == True = (m, (Num 0))
-	| otherwise = (eval m (Var (show (snd((eval m a))))))
+	| (toBool (snd (eval m (Op2 Lt (Lit (snd (eval m a))) (Lit (Num 0)))))) == True = (Map.insert "-1" "Error: Variable Negativa\n" (fst (eval m (Op2 Lt (Lit (snd (eval m a))) (Lit 1)))), Num 0) 
+	| otherwise = (eval (fst (eval m a)) (Var (show (snd (eval m a)))))
 	
 	
 -- PRUEBAS ............................................................................

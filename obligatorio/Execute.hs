@@ -25,7 +25,7 @@ execute m (Simple a) s
 				in if (evalError (fst dupla)) then 
 						(fst dupla, s ++ ((fst dupla) Map.! "-1"))
 					else
-						((fst dupla), show (snd dupla))
+						((fst dupla), s)
 
 
 
@@ -59,12 +59,12 @@ execute m Exit s = let memoria = Map.insert "-2" "Exit" m
 --   OUT> (fromList [("1","11"),("2","20"),("3","0")],"1\t0\t3\n")
 execute m (Sequence l) s
 	| evalError m  == True = (m, s)
-	| length l > 1 = let dupla = execute m (head l) s
+	| length l > 1 = let dupla = execute m (head l) (s)
 					in if ((evalError (fst dupla)) || (evalExit (fst dupla))) then -- VER ACA QUE PASA CON EL Exit.
 							dupla
 						else
 							execute (fst dupla) (Sequence (tail l)) (snd dupla)
-	| otherwise = execute m (head l) s
+	| otherwise = execute m (head l) (s)
 
 
 -- If Expr Statement Statment
@@ -75,7 +75,7 @@ execute m (If a st1 st2) s
 	| evalError (fst (eval m a)) == True = let dupla = eval m a
 										in (fst dupla, s ++ ((fst dupla) Map.! "-1"))
 	| otherwise = let dupla = eval m a
-				in if (toBool (snd dupla)) then 
+				in if ((toBool (snd dupla)) == True) then 
 						execute (fst dupla) st1	s
 					else
 						execute (fst dupla) st2 s
@@ -162,7 +162,7 @@ execute''  :: Map String String -> Statement -> String -> (Map String String, St
 execute'' m (Print l) s
 	| evalError m  == True = (m, s)
 	| length l > 1 = let dupla = (eval m (head l)) 
-					in execute'' (fst dupla) (Print (tail l)) (s ++ (show (snd dupla)) ++ "\t")  
+					in execute'' (fst dupla) (Print (tail l)) (s ++ (show (snd dupla)) ++ " ")  
 	| otherwise = let dupla = (eval m (head l)) 
 				in (fst dupla, s ++ (show (snd dupla)) ++ "\n")
 
