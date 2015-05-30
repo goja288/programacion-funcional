@@ -90,7 +90,8 @@ procesarLinea awp salida lineas indice memoria = do
   		-- let varAutomaticas = [("NR",show indice),("NF",show (length (words linea))),("-3",nfAnterior),("0",linea)]
 
   		-- actualizo nr y nf y -3
-  		let memoriaNR = Map.insert "NR" (show indice) memoria
+  		let indiceInc = indice + 1 
+  		let memoriaNR = Map.insert "NR" (show indiceInc) memoria
   		let memoriaNF = Map.insert "NF" (show (length (words linea))) memoriaNR
   		let memoriaMenos3 = Map.insert "-3" nfAnterior memoriaNF
   		let memoria = Map.insert "0" linea memoriaMenos3

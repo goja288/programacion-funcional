@@ -9,10 +9,10 @@ ghc -o awki Awki.hs
 # run tests
 
 progs[0]='{ print }'
-# progs[1]='BEGIN { print "NR: ", NR, "NF: ", NF, "$0: ", $0, "$1: ", $1 }; END { print "NR: ", NR, "NF: ", NF, "$0: ", $0, "$1: ", $1 }'
-# progs[2]='{}'
-# progs[3]='1 > 0 { print }'
-# progs[4]='{ if (NF > max) max = NF }; END { print max }'
+progs[1]='BEGIN { print "NR: ", NR, "NF: ", NF, "$0: ", $0, "$1: ", $1 }; END { print "NR: ", NR, "NF: ", NF, "$0: ", $0, "$1: ", $1 }'
+progs[2]='{}'
+progs[3]='1 > 0 { print }'
+progs[4]='{ if (NF > max) max = NF }; END { print max }'
 # progs[5]='NF > 0'
 # progs[6]='{ if (NF > 0) print }'
 # progs[7]='{ nlines++ }; END { print nlines }'
@@ -34,7 +34,7 @@ do
   echo "running $prog ..."
   awk "$prog" tests/sample.txt > salidas/awk-output.txt
   cat tests/sample.txt | ./awki "$prog" > salidas/awki-output.txt
-  diff salidas/awk-output.txt salidas/awki-output.txt
+  diff -b salidas/awk-output.txt salidas/awki-output.txt
 done
 
 # cleanup
