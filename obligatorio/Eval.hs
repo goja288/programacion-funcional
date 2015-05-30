@@ -35,12 +35,12 @@ eval m (Op2 Mul a b)
 eval m (Op2 Div a b)
 	| evalError m  == True = (m, (Num 0))
 	| (toInt (snd (eval m b))) /= 0 = (m, Num (div  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
-	| otherwise = (Map.insert "errorFlag" "ERROR: DIVISION POR 0" m, (Num 0))
+	| otherwise = (Map.insert "-1" "awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n" m, (Num 0))
 	
 eval m (Op2 Mod a b)
 	| evalError m  == True = (m, (Num 0))
 	| (toInt (snd (eval m b))) /= 0 = (m, Num (mod  (toInt (snd (eval m a))) (toInt (snd (eval m b)))))
-	| otherwise = (Map.insert "errorFlag" "ERROR: DIVISION POR 0" m, (Num 0))
+	| otherwise = (Map.insert "-1" "awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n" m, (Num 0))
 
 -- VER ALGUN EJEMPLO COMO HIZO EL RESTO CON EL TEMA DE LAS COMPARACIONES, QUE DEVUELVEN?
 eval m (Op2 Lt a b) 
@@ -152,4 +152,4 @@ toString maybeValue = case maybeValue of
   Nothing    -> ""
   
 evalError :: Map String String -> Bool
-evalError m = Map.member "errorFlag" m 
+evalError m = Map.member "-1" m 
