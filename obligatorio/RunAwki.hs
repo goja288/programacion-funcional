@@ -13,14 +13,29 @@ import Execute
 runAwki :: AwkiProg -> String -> String
 runAwki awkiProg entrada = do
 
+	-- Inicializo la memoria 
+	let memoria = Map.fromList [("NR",show 0),("NF",show 0),("-3",show 0)]
+
 	-- Tomo la entrada y la separo por lineas
 	let lineas = lines entrada
 
-	-- Ordeno el AwkiProg (BEGIN's al ppio, END's al final y el resto en el medio)
+	-- Ordeno el AwkiProg (BEGIN's al ppio, END's al final y el resto en el medio) - NO TIENE MUCHO SENTIDO AHORA
 	let awkiProgOrdenado = ordenarAwkiProg awkiProg
 
-	-- Inicializo la memoria 
-	let memoria = Map.fromList [("NR",show 0),("NF",show 0),("-3",show 0)]
+	-- BEGIN
+	let awpBEGIN = AwkiProg ( (filter esBegin (awkiProgToList awkiProgOrdenado)))
+	let resBEGIN = procesarBeginsEnds awpBEGIN ("") memoria
+
+	-- EXPR
+	let awpEXPR = AwkiProg ( (filter esExpr (awkiProgToList awkiProgOrdenado)))
+	let resEXPR = procesarLinea awpEXPR (snd resBEGIN) lineas 0 (fst resBEGIN)
+
+	-- END
+	let awpEND = AwkiProg ( (filter esEnd (awkiProgToList awkiProgOrdenado)))
+	let resEND = procesarBeginsEnds awpEND (snd resEXPR) (fst resEXPR) 
+
+	-- Obtenglo los BEGINS
+
 
 	-- let salida = "ESTA ES LA SALIDA \n"
     
@@ -30,12 +45,25 @@ runAwki awkiProg entrada = do
                 -- then ejecutar accion sobre linea
 		-- } 
 	-- }
-	let res = procesarLinea awkiProgOrdenado "" lineas 0 memoria
 
-	let a = (snd res)
+	let a = (snd resEND)
 	a
 
+----
+-- procesarBeginsEnds
+----
+procesarBeginsEnds :: AwkiProg -> String -> Map String String -> (Map String String,String)
+procesarBeginsEnds awp salida memoria = do
 
+		let listaPatronAccion = awkiProgToList awp
+		if (not(Map.member "-1" memoria)) then do 			
+			-- let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
+			recorrerPatronStatement memoria "" listaPatronAccion salida
+		else do
+			(memoria,salida)
+----
+-- END procesarBeginsEnd
+----
 
 -- 
 procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String String -> (Map String String,String)
@@ -104,12 +132,21 @@ recorrerPatronStatement memoria linea awkiList salida
 					dupla
 				else
 					recorrerPatronStatement (fst dupla) linea (tail awkiList) (snd dupla)
+	| length awkiList == 0 = (memoria,salida)
 	| otherwise = aux2 memoria linea salida (head awkiList)
 
 
 aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
-aux2 memoria linea salida (BEGIN,st) = (memoria,salida)
-aux2 memoria linea salida (END,st) = (memoria,salida)
+aux2 memoria linea salida (BEGIN,st) = 
+	if (Map.member "-1" memoria) then do
+		(memoria,salida)
+	else do
+		(execute memoria st (salida))
+aux2 memoria linea salida (END,st) =  
+	if (Map.member "-1" memoria) then do
+		(memoria,salida)
+	else do
+		(execute memoria st (salida))
 aux2 memoria linea salida (Pat e,st) = do
 	let dupla = eval memoria e -- -> (Map String String, Valor)
 	let resExpr = toBool (snd dupla)
@@ -133,9 +170,6 @@ aux3 memoria
 			quitarVariablesPesos (toInt (Str nfAnterior)) memoria
 	| otherwise = 
 		memoria
-  		
-	  	
-	  	
 
 
 quitarVariablesPesos :: Int -> Map String String -> Map String String
@@ -148,92 +182,6 @@ quitarVariablesPesos tope memoria
 	| otherwise =  Map.delete (show tope) memoria
 ---------
 
-
--- AwkiProg como lista
--- String de entrada
--- Memoria inicial
--- 
--- Devuelve la memoria con NR incrementado
---runAwkiIter :: AwkiProg -> [String] -> Num -> Map String String -> Map String String
---runAwkiIter awp lineas indice m = do
-	
---	let awpList = awkiProgToList awp -- Lo paso a lista
---
---	map (aux) 
-
---	Map.insert "$1" "esto es una var" m 
-
-	-- print varAutomaticas3
-
-
-
-
--- AwkiProg como lista
--- String de entrada
--- Memoria inicial
--- 
--- Devuelve la memoria con NR incrementado
---runAwkiIter :: [(Patron,Statement)] -> String -> Map String String -> Map String String
---runAwkiIter awp str m = do
-
-
---	Map.insert "$1" "esto es una var" m 
-
---	run 
-	-- print varAutomaticas3
-
-	
-
-
-
-cargarVariablesAutomaticas :: String -> Map String String -> Map String String
-cargarVariablesAutomaticas str m = do
-
-	let lineas = lines str
-  	-- putStrLn "LINEAS: "
-  	-- print lineas
-  	let campos = map words lineas
-  	--	putStrLn "CAMPOS: "
-  --		print campos 
-
-	-- Numero de linea 
-  	let nr = length lineas
-  	--	putStr "NR: "
-  	--	print (show nr) 
-
-  	-- Cantidad de campos que tiene la linea
-  	let nf = last (map length campos)
-  	-- 	putStrLn "NF: "
-  	-- 	print (show nf) 
-	
-	
-	Map.fromList [("NF",show nf),("NR",show nr)] 
-
-
-	-- print "dasd"
-	--print varAutomaticas2;
-
-	--let varAutomaticas3 = Map.insert "$1" "esto es una var" (varAutomaticas2) 
-	-- print varAutomaticas3
-
-
-	-- Obtener valor 
-	--let valor = Map.lookup "NF" varAutomaticas3
-
-	--putStrLn $ "ESTO es el valor de NF: " ++ (show valor)
-
-imprimirMap :: Map String String -> String
-imprimirMap m = foldl1 (++) (map (++"\n") (map juntarDupla (Map.toList m)))
-
---imprimirABORRAR :: AwkiProg -> String
---imprimirABORRAR (AwkiProg xs) = foldl1 (++) (map juntarDupla2 (xs))
-
- 
---juntarDupla :: (String, String) -> String
--- juntarDupla (a,b) = a ++ "\t" ++b
-
-juntarDupla :: (String, String) -> String
-juntarDupla (a,b) = a ++ "\t" ++b
 
 
 --- VA A RECIBIR UN AWIKIPROG Y DEVUELVE UN AWIKIPROGORDENADO
