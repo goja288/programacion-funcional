@@ -63,6 +63,23 @@ execute m (Sequence l) s
 	| otherwise = execute m (head l) s
 
 
+-- If Expr Statement Statment
+-- Test1: putStrLn (snd (execute (Map.fromList [("1","10"), ("2","20")]) (If (Var "1") (Print [(Lit 1), (Op2 Mod (Lit 2) (Var "2")), (Lit 3)]) (Print (Var "2"))) ""))
+--   OUT> 1       2       3
+execute m (If a st1 st2) s
+	| evalError m  == True = (m, s)
+	| evalError (fst (eval m a)) == True = let dupla = eval m a
+										in (fst dupla, s ++ ((fst dupla) Map.! "-1"))
+	| otherwise = let dupla = eval m a
+				in if (toBool (snd dupla)) then 
+						execute (fst dupla) st1	s
+					else
+						execute (fst dupla) st2 s
+
+
+-- For Expr Expr Expr Statment
+--execute 
+
 
 
 
