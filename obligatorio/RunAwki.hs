@@ -30,7 +30,7 @@ runAwki awkiProg entrada = do
                 -- then ejecutar accion sobre linea
 		-- } 
 	-- }
-	let res = procesarLinea awkiProgOrdenado "#1#" lineas 0 memoria
+	let res = procesarLinea awkiProgOrdenado "" lineas 0 memoria
 
 	let a = (snd res)
 	a
@@ -76,15 +76,15 @@ procesarLinea awp salida lineas indice memoria = do
 
 			if (Map.member "-1" (fst res)) then do 
 		--		-- ERROR
-				(fst res,(snd res) ++ "#2#")
+				(fst res,(snd res))
 			else do
 				let indiceInc = indice + 1 
 				procesarLinea awp (snd res) lineas indiceInc (fst res)
 				-- (memoria,salida ++ "#2.5#")
 		else do
-			(memoria,salida ++ "#3#")
+			(memoria,salida)
 	else do
-		(memoria,salida ++ "#4#")
+		(memoria,salida)
 
 
 agregarVariablesCampos :: [String] -> Int -> Map String String -> Map String String
@@ -108,8 +108,8 @@ recorrerPatronStatement memoria linea awkiList salida
 
 
 aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
-aux2 memoria linea salida (BEGIN,st) = (memoria,salida ++ "#5#")
-aux2 memoria linea salida (END,st) = (memoria,salida ++ "#6#")
+aux2 memoria linea salida (BEGIN,st) = (memoria,salida)
+aux2 memoria linea salida (END,st) = (memoria,salida)
 aux2 memoria linea salida (Pat e,st) = do
 	let dupla = eval memoria e -- -> (Map String String, Valor)
 	let resExpr = toBool (snd dupla)
@@ -119,10 +119,10 @@ aux2 memoria linea salida (Pat e,st) = do
 		(fst dupla, salida ++ ( (fst dupla) Map.! "-1"))
 	else if (resExpr == True) then do
 		-- EJECUTAR STATEMENT linea
-		(execute (fst dupla) st (salida ++ "#7#") ) 
+		(execute (fst dupla) st (salida) ) 
 		-- (fst t1,(snd t1) ++ "#7.5#")
 	else do
-		(memoria,salida ++ "#8#")
+		(memoria,salida)
 	
 
 aux3 :: Map String String -> Map String String
