@@ -20,7 +20,7 @@ runAwki awkiProg entrada = do
 	let awkiProgOrdenado = ordenarAwkiProg awkiProg
 
 	-- Inicializo la memoria 
-	let memoria = Map.fromList [("NR",show 0),("NF",show 0)]
+	let memoria = Map.fromList [("NR",show 0),("NF",show 0),("-3",show 0)]
 
 	-- let salida = "ESTA ES LA SALIDA \n"
     
@@ -34,7 +34,8 @@ runAwki awkiProg entrada = do
 
 	let a = (snd res)
 	a
-	
+
+
 
 -- 
 procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String String -> (Map String String,String)
@@ -43,15 +44,35 @@ procesarLinea awp salida lineas indice memoria = do
 	if (indice < (length lineas)) then do
 		
 		let linea = (lineas !! indice) 
+		let campos = words linea
+		let nr = indice
+  		let nf = length campos
+  
+  		let duplaMemoriaNfAnterior = aux3 memoria 
+  		let memoria = duplaMemoriaNfAnterior
+  		let nfAnterior = show nf	
 
-		let memoriaAux = Map.insert "0" ("asdasdsadasdsadasdsadasdsadasdsadasdasdasdasdasdas") memoria
-		-- let memoria = memoriaAux
+		let memoriaConCampos = agregarVariablesCampos campos 1  memoria 
+		let memoria = memoriaConCampos 
 
+		let memoriaAux = Map.insert "0" (linea) memoria
+		let memoria = memoriaAux -- Como forzar haskel :S
+
+  		-- El -3 guarda la linea anterior
+  		-- let varAutomaticas = [("NR",show indice),("NF",show (length (words linea))),("-3",nfAnterior),("0",linea)]
+
+  		-- actualizo nr y nf y -3
+  		let memoriaNR = Map.insert "NR" (show indice) memoria
+  		let memoriaNF = Map.insert "NF" (show (length (words linea))) memoriaNR
+  		let memoriaMenos3 = Map.insert "-3" nfAnterior memoriaNF
+  		let memoria = Map.insert "0" linea memoriaMenos3
+
+		
 		let listaPatronAccion = awkiProgToList awp
-		if (not(Map.member "-1" memoriaAux)) then do 
+		if (not(Map.member "-1" memoria)) then do 
 			
 			-- let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
-			let res = recorrerPatronStatement memoriaAux linea listaPatronAccion salida
+			let res = recorrerPatronStatement memoria linea listaPatronAccion salida
 
 			if (Map.member "-1" (fst res)) then do 
 		--		-- ERROR
@@ -64,6 +85,13 @@ procesarLinea awp salida lineas indice memoria = do
 			(memoria,salida ++ "#3#")
 	else do
 		(memoria,salida ++ "#4#")
+
+
+agregarVariablesCampos :: [String] -> Int -> Map String String -> Map String String
+agregarVariablesCampos [] _ memoria = memoria
+agregarVariablesCampos (x:xs) indice memoria = do
+	let indiceInc = indice + 1
+	Map.insert (show indice) x (agregarVariablesCampos xs indiceInc memoria )
 
 
 recorrerPatronStatement :: Map String String -> String -> [(Patron,Statement)] -> String -> (Map String String, String)
@@ -95,8 +123,29 @@ aux2 memoria linea salida (Pat e,st) = do
 		-- (fst t1,(snd t1) ++ "#7.5#")
 	else do
 		(memoria,salida ++ "#8#")
-		
-		
+	
+
+aux3 :: Map String String -> Map String String
+aux3 memoria  
+	| (Map.member "-3" memoria) =
+		let nfAnterior = memoria Map.! "-3"
+		in 
+			quitarVariablesPesos (toInt (Str nfAnterior)) memoria
+	| otherwise = 
+		memoria
+  		
+	  	
+	  	
+
+
+quitarVariablesPesos :: Int -> Map String String -> Map String String
+quitarVariablesPesos tope memoria  
+	| (tope == 0) = memoria 
+	| (tope > 1) = do
+		let topeAux = tope - 1
+		let memoriaAux = Map.delete (show tope) memoria
+		quitarVariablesPesos topeAux memoriaAux    
+	| otherwise =  Map.delete (show tope) memoria
 ---------
 
 
