@@ -63,7 +63,7 @@ eval m (Op2 Div a b)
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
-		in (Map.insert "-1" "awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n" (fst dupla2), (Num 0))
+		in (Map.insert "-1" "Error: Division por 0\n" (fst dupla2), (Num 0))
 	
 eval m (Op2 Mod a b)
 	| evalError m  == True = (m, (Num 0))
@@ -78,7 +78,7 @@ eval m (Op2 Mod a b)
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
-		in (Map.insert "-1" "awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n" (fst dupla2), (Num 0))
+		in (Map.insert "-1" "Error: Division por 0\n" (fst dupla2), (Num 0))
 
 -- VER ALGUN EJEMPLO COMO HIZO EL RESTO CON EL TEMA DE LAS COMPARACIONES, QUE DEVUELVEN?
 eval m (Op2 Lt a b) 
