@@ -39,15 +39,20 @@ runAwki awkiProg entrada = do
 -- 
 procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String String -> (Map String String,String)
 procesarLinea awp salida lineas indice memoria = do
-	
+
 	if (indice < (length lineas)) then do
 		
 		let linea = (lineas !! indice) 
+
+		let memoriaAux = Map.insert "0" ("asdasdsadasdsadasdsadasdsadasdsadasdasdasdasdasdas") memoria
+		-- let memoria = memoriaAux
+
 		let listaPatronAccion = awkiProgToList awp
-		if (not(Map.member "-1" memoria)) then do 
+		if (not(Map.member "-1" memoriaAux)) then do 
 			
-			let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [(Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
-			
+			-- let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
+			let res = recorrerPatronStatement memoriaAux linea listaPatronAccion salida
+
 			if (Map.member "-1" (fst res)) then do 
 		--		-- ERROR
 				(fst res,(snd res) ++ "#2#")
@@ -61,8 +66,17 @@ procesarLinea awp salida lineas indice memoria = do
 		(memoria,salida ++ "#4#")
 
 
--- recorrerPatronStatement :: [(Patron,Statement)] -> [(Patron,Statement)]
--- recorrerPatronStatement lista = map aux2 
+recorrerPatronStatement :: Map String String -> String -> [(Patron,Statement)] -> String -> (Map String String, String)
+recorrerPatronStatement memoria linea awkiList salida 
+	| evalError memoria  == True = (memoria, salida)
+	| length awkiList > 1 = 
+			let dupla =  aux2 memoria linea salida (head awkiList)
+			in 
+				if (evalError (fst dupla) == True) then 
+					dupla
+				else
+					recorrerPatronStatement (fst dupla) linea (tail awkiList) (snd dupla)
+	| otherwise = aux2 memoria linea salida (head awkiList)
 
 
 aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
@@ -208,4 +222,9 @@ patronEq _ _ = False
 
 instance Eq Patron where
   a == b = patronEq a b
+
+
+
+evalError :: Map String String -> Bool
+evalError m = Map.member "-1" m 
 
