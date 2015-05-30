@@ -20,7 +20,7 @@ runAwki awkiProg entrada = do
 	let awkiProgOrdenado = ordenarAwkiProg awkiProg
 
 	-- Inicializo la memoria 
-	let memoria = Map.fromList [("NR",show 0),("NF",show 0)]
+	let memoria = Map.fromList [("NR",show 0),("NF",show 0),("0"," ESTO ES LO QUE ESTA EN EL LUGAR 0")]
 
 	-- let salida = "ESTA ES LA SALIDA \n"
     
@@ -46,8 +46,9 @@ procesarLinea awp salida lineas indice memoria = do
 		let listaPatronAccion = awkiProgToList awp
 		if (not(Map.member "-1" memoria)) then do 
 			
-			let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
-			
+			-- let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
+			let res = recorrerPatronStatement memoria linea listaPatronAccion salida
+
 			if (Map.member "-1" (fst res)) then do 
 		--		-- ERROR
 				(fst res,(snd res) ++ "#2#")
@@ -61,8 +62,17 @@ procesarLinea awp salida lineas indice memoria = do
 		(memoria,salida ++ "#4#")
 
 
--- recorrerPatronStatement :: [(Patron,Statement)] -> [(Patron,Statement)]
--- recorrerPatronStatement lista = map aux2 
+recorrerPatronStatement :: Map String String -> String -> [(Patron,Statement)] -> String -> (Map String String, String)
+recorrerPatronStatement memoria linea awkiList salida 
+	| evalError memoria  == True = (memoria, salida)
+	| length awkiList > 1 = 
+			let dupla =  aux2 memoria linea salida (head awkiList)
+			in 
+				if (evalError (fst dupla) == True) then 
+					dupla
+				else
+					recorrerPatronStatement (fst dupla) linea (tail awkiList) (snd dupla)
+	| otherwise = aux2 memoria linea salida (head awkiList)
 
 
 aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
@@ -208,4 +218,9 @@ patronEq _ _ = False
 
 instance Eq Patron where
   a == b = patronEq a b
+
+
+
+evalError :: Map String String -> Bool
+evalError m = Map.member "-1" m 
 
