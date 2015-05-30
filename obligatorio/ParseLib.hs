@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------
 -- 
--- 	Haskell: The Craft of Functional Programming, 3e
--- 	Simon Thompson
--- 	(c) Addison-Wesley, 1996-2011.
+--  Haskell: The Craft of Functional Programming, 3e
+--  Simon Thompson
+--  (c) Addison-Wesley, 1996-2011.
 -- 
--- 	ParseLib.hs
+--  ParseLib.hs
 -- 
--- 	Library functions for parsing	
---      Note that this is not a monadic approach to parsing.	
+--  Library functions for parsing 
+--      Note that this is not a monadic approach to parsing.  
 -- 
 ---------------------------------------------------------------------------                                                                                                  
 
@@ -17,41 +17,41 @@ import Data.Char
 
 infixr 5 >*>
 --   
--- The type of parsers.						
+-- The type of parsers.           
 --  
 type Parse a b = [a] -> [(b,[a])]
 --  
--- Some basic parsers						
+-- Some basic parsers           
 --  
 --  
--- Fail on any input.						
+-- Fail on any input.           
 --  
 none :: Parse a b
 none inp = []
 --  
--- Succeed, returning the value supplied.				
+-- Succeed, returning the value supplied.       
 --  
 succeed :: b -> Parse a b 
 succeed val inp = [(val,inp)]
 --  
--- token t recognises t as the first value in the input.		
+-- token t recognises t as the first value in the input.    
 --  
 token :: Eq a => a -> Parse a a
 token t (x:xs) 
-  | t==x 	= [(t,xs)]
-  | otherwise 	= []
+  | t==x  = [(t,xs)]
+  | otherwise   = []
 token t []    = []
 --  
--- spot whether an element with a particular property is the 	
--- first element of input.						
+-- spot whether an element with a particular property is the  
+-- first element of input.            
 --  
 spot :: (a -> Bool) -> Parse a a
 spot p (x:xs) 
-  | p x 	= [(x,xs)]
-  | otherwise 	= []
+  | p x   = [(x,xs)]
+  | otherwise   = []
 spot p []    = []
 --  
--- Examples.							
+-- Examples.              
 --  
 bracket = token '('
 dig     =  spot isDigit
@@ -62,31 +62,31 @@ endOfInput :: b -> Parse a b
 endOfInput x [] = [(x,[])]
 endOfInput x _  = []
 --  
--- Combining parsers						
+-- Combining parsers            
 --  
 --  
--- alt p1 p2 recognises anything recogniseed by p1 or by p2.	
+-- alt p1 p2 recognises anything recogniseed by p1 or by p2.  
 --  
 alt :: Parse a b -> Parse a b -> Parse a b
 alt p1 p2 inp = p1 inp ++ p2 inp
 exam1 = (bracket `alt` dig) "234" 
 --  
--- Apply one parser then the second to the result(s) of the first.	
+-- Apply one parser then the second to the result(s) of the first.  
 --  
 
 (>*>) :: Parse a b -> Parse a c -> Parse a (b,c)
--- 	
+--  
 (>*>) p1 p2 inp 
   = [((y,z),rem2) | (y,rem1) <- p1 inp , (z,rem2)  <- p2 rem1 ]
 --  
--- Transform the results of the parses according to the function.	
+-- Transform the results of the parses according to the function. 
 --  
 build :: Parse a b -> (b -> c) -> Parse a c
 build p f inp = [ (f x,rem) | (x,rem) <- p inp ]
 --  
--- Recognise a list of objects.					
+-- Recognise a list of objects.         
 --  
--- 	
+--  
 list :: Parse a b -> Parse a [b]
 list p = (succeed []) 
          `alt`
@@ -96,7 +96,7 @@ list p = (succeed [])
 --  
 -- Some variants...
 
--- A non-empty list of objects.						
+-- A non-empty list of objects.           
 --  
 neList   :: Parse a b -> Parse a [b]
 neList p = (p  `build` (:[]))

@@ -34,13 +34,9 @@ lexer ('+':'+':cs) = "++" : lexer cs
 lexer ('-':'-':cs) = "--" : lexer cs
 lexer ('&':'&':cs) = "&&" : lexer cs
 lexer ('|':'|':cs) = "||" : lexer cs
-lexer ('+':'=':cs) = "+=" : lexer cs
-lexer ('*':'=':cs) = "*=" : lexer cs
-lexer ('/':'=':cs) = "/=" : lexer cs
-lexer ('%':'=':cs) = "%=" : lexer cs
-lexer ('>':'=':cs) =  ">=" : lexer cs
-lexer ('<':'=':cs) =  "<=" : lexer cs
-lexer ('=':'=':cs) =  "==" : lexer cs
+-- operadores de la forma +=
+lexer (c:'=':cs)
+  |c `elem` "+*/%-!<>=" =  (c:"=") : lexer cs
 -- cadenas (no se guarda la última comilla: "hola )
 lexer ('"':cs) = let (as,bs) = span (/='"') cs
                  in ('"':as) : if null bs then []
@@ -189,7 +185,7 @@ expre6 = (expre5 >*>
           list (opor >*> expre5))
          `build` mkExpr
 opor :: Parse String BOp  
-opor = token "&&" `build` const Or         
+opor = token "||" `build` const Or         
 
 -- expre7: = += *= -= (asociativo a la derecha)
 expre7 :: Parse String Expr
@@ -213,6 +209,7 @@ opacc = (token "+=" `build` const Add)
       (token "-=" `build` const Sub)
       `alt`
       (token "%=" `build` const Mod)
+
 -- expresiones en general
 expre :: Parse String Expr
 expre = expre7
@@ -298,16 +295,22 @@ patron = (expre `build` Pat)
          (token "END" `build` const END)
          `alt`
          (token "BEGIN" `build` const BEGIN)
-         `alt`
-         succeed (Pat (Lit 1))
+
 
 -- acciones
 accion :: Parse String Statement
-accion = succeed (Print [Field (Lit 0)]) `alt` ssequence
+accion =  ssequence
 
 -- reglas
 regla :: Parse String (Patron,Statement)
-regla = patron >*> accion
+regla =
+  (patron `build` (\pat -> ( pat , print0)) ) 
+  `alt`
+  (accion  `build` \ac -> (pat0,ac) )
+  `alt`
+  (patron >*> accion)
+  where print0 = Print [Field (Lit 0)]
+        pat0  = Pat $ Lit 1
 
 -- programa Awki
 -- Las reglas deben separarse por ;
