@@ -132,12 +132,12 @@ execute m (DoWhile st a) s
 						let 
 						result = eval (fst dupla) a
 						in if(evalError (fst result)) then
-								(fst result, s ++ ((fst result) Map.! "-1"))
+								(fst result, (snd dupla) ++ ((fst result) Map.! "-1"))
 							else
 								if (toBool (snd result)) then
 									execute (fst result) (DoWhile st a) (snd dupla)	
 								else 
-									(fst result, s)
+									(fst result, snd dupla)
 
 
 
