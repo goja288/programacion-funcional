@@ -218,7 +218,7 @@ execute''  :: Map String String -> Statement -> String -> (Map String String, St
 execute'' m (Print l) s
 	| evalError m  == True = (m, s)
 	| length l > 1 = let dupla = (eval m (head l)) 
-					in execute'' (fst dupla) (Print (tail l)) (s ++ (show (snd dupla)) ++ " ")  
+					in execute'' (fst dupla) (Print (tail l)) (s ++ (show (snd dupla)) ++ "\t")  
 	| otherwise = let dupla = (eval m (head l)) 
 				in (fst dupla, s ++ (show (snd dupla)) ++ "\n")
 
