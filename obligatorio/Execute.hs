@@ -82,11 +82,16 @@ execute m (If a st1 st2) s
 
 
 -- For Expr Expr Expr Statment
--- execute m (For a1 a2 a3 Statment) s
---	| evalError m  == True = (m, s) 
---	| otherwise = let dupla1 = eval m a1
---					  dupla2 = if (evalError (fst dupla1)) then
---					  				(m, s ++ ((fst dupla) Map.! "-1"))
+execute m (For a1 a2 a3 st) s
+	| evalError m  == True = (m, s) 
+	| otherwise = let 
+				dupla1 = eval m a1
+				in if (evalError (fst dupla1)) then
+							(m, s ++ ((fst dupla1) Map.! "-1"))
+						else
+							execute''' (fst dupla1) a2 a3 st s
+
+
 
 
 
@@ -167,9 +172,23 @@ execute'' m (Print l) s
 				in (fst dupla, s ++ (show (snd dupla)) ++ "\n")
 
 
--- execute''' :: Map String String -> Expr -> Expr -> Statment -> String -> (Map String String, String)
--- execute' m a2 a3 st s
---	| evalError m  == True = (m, s) 
---	| otherwise = let dupla1 = eval m a2
---					  dupla2 = if (evalError (fst dupla1)) then
---					  				(m, s ++ ((fst dupla) Map.! "-1"))
+execute''' :: Map String String -> Expr -> Expr -> Statement -> String -> (Map String String, String)
+execute''' m a2 a3 st s
+	| evalError m  == True = (m, s) 
+	| otherwise = let dupla1 = eval m a2
+				in if (evalError (fst dupla1)) then
+						(fst dupla1, s ++ ((fst dupla1) Map.! "-1"))
+					else
+					  	if ((toBool (snd dupla1)) == True) then
+					  		let 
+					  		body = execute (fst dupla1) st s
+					  		inc = eval (fst body) a3
+					  		in if (evalError (fst body)) then
+					  				body
+					  			else
+					  				if (evalError (fst inc)) then
+					  					(fst inc, s ++ ((fst inc) Map.! "-1"))
+					  				else
+					  					execute''' (fst inc) a2 a3 st (snd body)
+					  	else
+					  		(fst dupla1, s)

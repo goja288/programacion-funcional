@@ -277,7 +277,7 @@ eval m (PP False False s)
 -- DEFINIMOS LA EXPESION "FIELD EXPR" ------------------------------------------------------------------------------------------
 eval m (Field a)
 	| evalError m  == True = (m, (Num 0))
-	| (toBool (snd (eval m (Op2 Lt (Lit (snd (eval m a))) (Lit (Num 0)))))) == True = (Map.insert "-1" "Error: Variable Negativa\n" (fst (eval m (Op2 Lt (Lit (snd (eval m a))) (Lit 1)))), Num 0) 
+	| (toBool (snd (eval (fst (eval m a)) (Op2 Lt (Lit (snd (eval m a))) (Lit (Num 0)))))) == True = (Map.insert "-1" ("Error: Variable Negativa\n") (fst (eval (fst (eval m a)) (Op2 Lt (Lit (snd (eval m a))) (Lit 0)))), Num 0)
 	| otherwise = (eval (fst (eval m a)) (Var (show (snd (eval m a)))))
 	
 	
@@ -296,3 +296,9 @@ toString maybeValue = case maybeValue of
   
 evalError :: Map String String -> Bool
 evalError m = Map.member "-1" m 
+
+debugImprimirMemoria :: Map String String -> String
+debugImprimirMemoria memoria = "\n\t-------------\n\t" ++ (foldl1 (++) (map (++"\n") (map juntarDupla (Map.toList memoria)))) ++ "\n\t-------------\n"
+
+juntarDupla :: (String, String) -> String
+juntarDupla (a,b) = a ++ "\t" ++b
