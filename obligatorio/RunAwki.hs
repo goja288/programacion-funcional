@@ -1,7 +1,6 @@
 module RunAwki(runAwki) where
 
 import AwkiSA
-import Memoria
 
 import Data.Map (Map)
 import qualified Data.Map as Map
