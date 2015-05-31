@@ -1,0 +1,68 @@
+Haskell
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+ohhh noo
+56
+45
+58
+Antes de error div
+Error: Division por 0
+Antes de error modulo
+Error: Division por 0
+Antes de error acum div
+Error: Division por 0
+Antes de error acum modulo
+Error: Division por 0
+Antes de error $ < 0
+Error: Variable Negativa
+Antes de error $ < 0
+Error: Variable Negativa
+Antes de error div
+Error: Division por 0
+Antes de error modulo
+Error: Division por 0
+Antes de error acum div
+Error: Division por 0
+Antes de error acum modulo
+Error: Division por 0
+Antes de error $ < 0
+Error: Variable Negativa
+Antes de error $ < 0
+Error: Variable Negativa
+Antes de error div
+Error: Division por 0
+Antes de error modulo
+Error: Division por 0
+Antes de error acum div
+Error: Division por 0
+Antes de error acum modulo
+Error: Division por 0
+Antes de error $ < 0
+Error: Variable Negativa
+Antes de error div
+Error: Division por 0
+Antes de error modulo
+Error: Division por 0
+Antes de error acum div
+Error: Division por 0
+Antes de error acum modulo
+Error: Division por 0
+Antes de error $ < 0
+Error: Variable Negativa
+Antes de error $ < 0
+Error: Variable Negativa
