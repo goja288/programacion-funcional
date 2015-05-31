@@ -15,13 +15,17 @@ runAwki awkiProg entrada =
 	let 
 	memoria = Map.fromList [("NR",show 0),("NF",show 0),("-3",show 0)] -- Inicializo la memoria 
 	lineas = lines entrada -- Tomo la entrada y la separo por lineas
-	awkiProgOrdenado = ordenarAwkiProg awkiProg 	-- Ordeno el AwkiProg (BEGIN's al ppio, END's al final y el resto en el medio) - NO TIENE MUCHO SENTIDO AHORA
-	awpBEGIN = AwkiProg ( (filter esBegin (awkiProgToList awkiProgOrdenado)))	-- BEGIN
+	--awkiProgOrdenado = ordenarAwkiProg awkiProg 	-- Ordeno el AwkiProg (BEGIN's al ppio, END's al final y el resto en el medio) - NO TIENE MUCHO SENTIDO AHORA
+	awpBEGIN = AwkiProg ( (filter esBegin (awkiProgToList awkiProg)))	-- BEGIN
 	resBEGIN = procesarBeginsEnds awpBEGIN ("") memoria
-	awpEXPR = AwkiProg ( (filter esExpr (awkiProgToList awkiProgOrdenado)))	-- EXPR
+	awpEXPR = AwkiProg ( (filter esExpr (awkiProgToList awkiProg)))	-- EXPR
 	resEXPR = procesarLinea awpEXPR (snd resBEGIN) lineas 0 (fst resBEGIN)
-	awpEND = AwkiProg ( (filter esEnd (awkiProgToList awkiProgOrdenado))) -- END
-	resEND = procesarBeginsEnds awpEND (snd resEXPR) (fst resEXPR) -- END
+	awpEND = AwkiProg ( (filter esEnd (awkiProgToList awkiProg))) -- END
+
+	-- Borro el exit
+	memSinExit = Map.delete "-2" (fst resEXPR)
+
+	resEND = procesarBeginsEnds awpEND (snd resEXPR) memSinExit -- END
 	in (snd resEND)
 
 ----
@@ -44,6 +48,7 @@ procesarBeginsEnds awp salida memoria =
 procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String String -> (Map String String,String)
 procesarLinea awp salida lineas indice memoria 
 	| (indice >= (length lineas)) = (memoria, salida)
+	| (Map.member "-2" memoria) = (memoria,salida) -- Si hay un exit no sigo procesando las lineas 
 	| otherwise = 
 		let
 		linea = (lineas !! indice) 
@@ -113,13 +118,12 @@ recorrerPatronStatement memoria linea awkiList salida
 
 aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
 aux2 memoria linea salida (BEGIN,st) = 
-	if (Map.member "-1" memoria) then
+	if ((Map.member "-1" memoria) || (Map.member "-2" memoria)) then
 		(memoria,salida)
 	else
 		(execute memoria st (salida))
-
 aux2 memoria linea salida (END,st) =  
-	if (Map.member "-1" memoria) then
+	if ((Map.member "-1" memoria)  || (Map.member "-2" memoria)) then -- TODO NO ESTA ESPECIFICADO EN LA LETRA SI HAY UN exit EN LA SECCION END
 		(memoria,salida)
 	else
 		(execute memoria st (salida))
@@ -133,6 +137,8 @@ aux2 memoria linea salida (Pat e,st) =
 	-- SI HAY ERROR PREGUNTANDO POR LA FLAG LO AGREGO AL STRING DE SALIDA
 	if (Map.member "-1" (fst dupla)) then
 		(fst dupla, salida ++ ( (fst dupla) Map.! "-1"))
+	else if (Map.member "-2" (fst dupla)) then -- Me fijo si hay un exit
+		(fst dupla, salida) 
 	else 
 		if (resExpr == True) then
 			-- EJECUTAR STATEMENT linea
@@ -162,14 +168,6 @@ quitarVariablesPesos tope memoria
 	| otherwise =  Map.delete (show tope) memoria
 ---------
 
-
-
---- VA A RECIBIR UN AWIKIPROG Y DEVUELVE UN AWIKIPROGORDENADO
--- Con los BEGIN AL PRINCIPIO Y 
-ordenarAwkiProg :: AwkiProg -> AwkiProg 
---ordenarAwkiProg :: AwkiProg -> [(Patron,Statement)]
-ordenarAwkiProg xs = AwkiProg (( (filter esBegin (awkiProgToList xs))) ++ ( (filter esExpr (awkiProgToList xs))) ++ ( (filter esEnd (awkiProgToList xs))))
-
 esBegin :: (Patron,Statement) -> Bool
 esBegin (a,b) = (a == BEGIN)
 
@@ -179,28 +177,16 @@ esExpr (a,b) = (a /= BEGIN && a /= END)
 esEnd :: (Patron,Statement) -> Bool
 esEnd (a,b) = (a == END)
 
---ordenarAwkiProg (AwkiProg []) = (AwkiProg [])
---ordenarAwkiProg (AwkiProg ((x,y):xs)) 
---	| x == BEGIN = ()(AwkiProg [])
---ordenarAwkiProg (AwkiProg 
-
--- concat filter las que tienen begin + filter las que no tienen end + filter las que tienen end
-
-
 awkiProgToList :: AwkiProg -> [(Patron,Statement)]
 awkiProgToList (AwkiProg xs ) = xs
-
 
 patronEq :: Patron -> Patron -> Bool
 patronEq BEGIN BEGIN = True
 patronEq END END = True
 patronEq _ _ = False
 
-
 instance Eq Patron where
   a == b = patronEq a b
-
-
 
 evalError :: Map String String -> Bool
 evalError m = Map.member "-1" m 

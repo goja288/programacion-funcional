@@ -19,13 +19,26 @@ progs[7]='{ nlines++ }; END { print nlines }'
 progs[8]='{ nfields += NF }; END { print nfields }'
 progs[9]='{ if (NR > 1) exit; print }; END { print "The end" }'
 progs[10]='{ print NR, $0 }'
-progs[11]='!(NR >= 5) { for (f=1; f <= 3; ++f) if ($f != "") print $f }'
+#progs[11]='!(NR >= 5) { for (f=1; f <= 3; ++f) if ($f != "") print $f }'
 progs[12]='{ line = $0 }; { print line }'
 progs[13]='{ one = 1 }; { lines += one }; END { print lines }'
-progs[14]='{ while (i < NF) i++ }; END { print i }'
-progs[15]='{ i = 0; while (i < NF) i++ }; { f += i }; END { print f }'
+#progs[14]='{ while (i < NF) i++ }; END { print i }'
+#progs[15]='{ i = 0; while (i < NF) i++ }; { f += i }; END { print f }'
 progs[16]='{ print }; END { print "END" }; BEGIN { print "BEGIN" }'
 progs[17]='END { print "end 1" }; BEGIN { print "begin 1" }; END { print "end 2" }; BEGIN { print "begin 2" }'
+
+# Cristian y Gonza
+progs[49]='END { print "end 1" }; BEGIN { print "begin 1" }; {print "NF-1:", (NF-1)}; END { print "end 2" }; BEGIN { print "begin 2" }'
+## exit
+progs[50]='END { print "end 1" }; BEGIN { print "begin 1" }; {exit}; {print "NF-1:", (NF-1)}; END { print "end 2" }; BEGIN { print "begin 2" }'
+progs[51]='END { print "end A" }; BEGIN { print "begin 1" }; { if (NR < NF) exit}; {print "(NF-1) :", (NF-1)}; END { print "end B" }; BEGIN { print "begin 2" }'
+progs[52]='END { print "end A" }; BEGIN { print "begin 1" }; { if (NR < NF) exit}; {print "(NF-1) :", (NF-1)}; END { print "end B" }; BEGIN { exit }; BEGIN { print "begin 3" }'
+progs[53]='END { exit }; BEGIN { print "begin 1" }; { if (NR < NF) exit}; {print "(NF-1) :", (NF-1)}; END { print "end B" }; BEGIN { exit }; BEGIN { print "begin 3" }'
+
+
+# exit en el begin
+# exit en el medio y que queden inst
+# exit en el end
 
 IFS="" # to avoid spaces messing the array...
 
