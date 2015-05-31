@@ -14,6 +14,7 @@ execute :: Map String String -> Statement -> String -> (Map String String, Strin
 -- Empty
 execute m Empty s
 	| evalError m  == True = (m, s)
+	| evalExit m  == True = (m, s)
 	| otherwise = (m, s)
 
 
@@ -21,6 +22,7 @@ execute m Empty s
 -- Simple Expr
 execute m (Simple a) s
 	| evalError m  == True = (m, s)
+	| evalExit m  == True = (m, s)
 	| otherwise = let dupla = eval m a
 				in if (evalError (fst dupla)) then 
 						(fst dupla, s ++ ((fst dupla) Map.! "-1"))
@@ -38,6 +40,7 @@ execute m (Simple a) s
 --   OUT> (fromList [("1","10"),("2","20"),("3","0")],"awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n")
 execute m (Print l) s
 	| evalError m  == True = (m, s)
+	| evalExit m  == True = (m, s)
 	| otherwise = let hayError = execute' m (Print l) ""
 				in if ((snd hayError) /= "") then
 						((fst hayError), s ++ (snd hayError))
@@ -59,6 +62,7 @@ execute m Exit s = let memoria = Map.insert "-2" "Exit" m
 --   OUT> (fromList [("1","11"),("2","20"),("3","0")],"1\t0\t3\n")
 execute m (Sequence l) s
 	| evalError m  == True = (m, s)
+	| evalExit m  == True = (m, s)
 	| length l > 1 = let dupla = execute m (head l) (s)
 					in if ((evalError (fst dupla)) || (evalExit (fst dupla))) then -- VER ACA QUE PASA CON EL Exit.
 							dupla
@@ -72,6 +76,7 @@ execute m (Sequence l) s
 --   OUT> 1       2       3
 execute m (If a st1 st2) s
 	| evalError m  == True = (m, s)
+	| evalExit m  == True = (m, s)
 	| evalError (fst (eval m a)) == True = let dupla = eval m a
 										in (fst dupla, s ++ ((fst dupla) Map.! "-1"))
 	| otherwise = let dupla = eval m a
@@ -84,6 +89,7 @@ execute m (If a st1 st2) s
 -- For Expr Expr Expr Statment
 execute m (For a1 a2 a3 st) s
 	| evalError m  == True = (m, s) 
+	| evalExit m  == True = (m, s)
 	| otherwise = let 
 				dupla1 = eval m a1
 				in if (evalError (fst dupla1)) then
