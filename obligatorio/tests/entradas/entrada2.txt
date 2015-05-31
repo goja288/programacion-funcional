@@ -1,0 +1,4 @@
+esta es una linea de siete palabras
+ahora son\n tres
+90 esta es \\n la tercer linea de la entrada
+2) Rahul Maths 90

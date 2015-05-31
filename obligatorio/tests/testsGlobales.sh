@@ -95,8 +95,8 @@ progs[64]='END { print $0; print $2; print $3; print $4; print $5; }'
 # Orden de los patrones
 progs[65]='END { print a }; BEGIN { a = 28 * 2 }; END { print 45 }; 1 == 1 { print "ohhh noo" }; BEGIN { b = a + 2 }; END { print b }; BEGIN { print "Haskell" }'
 # Exit en do while
-#progs[36]='BEGIN {f = 15; do { if (f == 5) exit; --f } while (f >= 3); print "fin"}; END { print "fin" }'
-#progs[37]='BEGIN {f = 15; do { if (f == 5) exit; --f } while (1); print "fin"}; END { print "fin" }'
+progs[36]='BEGIN {f = 15; do { if (f == 5) exit; --f } while (f >= 3); print "fin"}; END { print "fin" }'
+progs[37]='BEGIN {f = 15; do { if (f == 5) exit; --f } while (1); print "fin"}; END { print "fin" }'
 
 ##############
 # Conjunto 4 #
@@ -169,19 +169,19 @@ progs[137]='BEGIN {if (NF == 1) exit; print }; BEGIN {print "The End" }'
 progs[138]='BEGIN { print NF }; BEGIN {print "The End" }'
 progs[139]='BEGIN {if (NR != 2) exit; print }; END {print "The End" }; {}'
 
-progs[140]='BEGIN {print "\t"}'
-progs[141]='BEGIN {print "hoa","\t","paa"}'
-progs[142]='BEGIN { print "\t","hoa","\t" }'
-progs[143]='BEGIN { print "\t","\t","\t" }'
-progs[144]='BEGIN { print "\t","\t","hoa" }'
-progs[145]='BEGIN { print "que pa\tjeje" }'
+# progs[140]='BEGIN {print "\t"}'
+# progs[141]='BEGIN {print "hoa","\t","paa"}'
+# progs[142]='BEGIN { print "\t","hoa","\t" }'
+# progs[143]='BEGIN { print "\t","\t","\t" }'
+# progs[144]='BEGIN { print "\t","\t","hoa" }'
+# progs[145]='BEGIN { print "que pa\tjeje" }'
 
-progs[146]='BEGIN {print "\n"}'
-progs[147]='BEGIN {print "hoa","\n","paa"}'
-progs[148]='BEGIN { print "\n","hoa","\n" }'
-progs[149]='BEGIN { print "\n","\n","\n" }'
-progs[150]='BEGIN { print "\n","\n","hoa" }'
-progs[151]='BEGIN { print "que pa\njeje" }'
+# progs[146]='BEGIN {print "\n"}'
+# progs[147]='BEGIN {print "hoa","\n","paa"}'
+# progs[148]='BEGIN { print "\n","hoa","\n" }'
+# progs[149]='BEGIN { print "\n","\n","\n" }'
+# progs[150]='BEGIN { print "\n","\n","hoa" }'
+# progs[151]='BEGIN { print "que pa\njeje" }'
 
 ##############
 # Conjunto 5 #
@@ -194,11 +194,15 @@ progs[161]='END { print $0 }'
 progs[162]='BEGIN { print "Iniciando..." }; END { print "Muy bien"; print $0 }'
 
 
+progs[163]='BEGIN { print "Antes de error do while"; i = 1; do { i++; print $i;} while (i <= NF);}; END { print "END.................................." }'
+
+
 IFS="" # to avoid spaces messing the array...
 
 # Multiples archivos de entrada
 entradas[0]='entradas/entrada.txt'
 entradas[1]='entradas/sample.txt'
+entradas[2]='entradas/entrada2.txt'
 
 echo -e "\n# Globales \n\n"
 for entrada in ${entradas[@]}

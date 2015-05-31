@@ -27,6 +27,18 @@ runAwki awkiProg entrada =
 	resEND = procesarBeginsEnds awpEND (snd resEXPR) memSinExit -- END
 	in (snd resEND)
 
+
+
+sustituirCaracteresEspeciales :: [Char] -> String
+sustituirCaracteresEspeciales [] = []
+sustituirCaracteresEspeciales (x:xs) =
+	if (x == '\n') then
+	 	"\n#." ++ (sustituirCaracteresEspeciales xs)
+	else if (x == '\t') then
+		"\t##" ++ (sustituirCaracteresEspeciales xs)
+	else
+		x:sustituirCaracteresEspeciales xs 
+
 ----
 -- procesarBeginsEnds
 ----
@@ -55,7 +67,7 @@ procesarLinea awp salida lineas indice memoria
 		nr = indice
   		nf = length campos
   
-  		duplaMemoriaNfAnterior = aux3 memoria 
+  		duplaMemoriaNfAnterior = definirTope memoria 
   		memoria1 = duplaMemoriaNfAnterior
   		nfAnterior = show nf	
 
@@ -141,14 +153,14 @@ ejecutarPatronStatement memoria linea salida (Pat e,st) =
 	else 
 		if (resExpr == True) then
 			-- EJECUTAR STATEMENT linea
-			(execute (fst dupla) st (salida) ) 
+			(execute (fst dupla) st salida) 
 			-- (fst t1,(snd t1) ++ "#7.5#")
 		else
 			(fst dupla,salida)
 	
 
-aux3 :: Map String String -> Map String String
-aux3 memoria  
+definirTope :: Map String String -> Map String String
+definirTope memoria  
 	| (Map.member "-3" memoria) =
 		let nfAnterior = memoria Map.! "-3"
 		in 
