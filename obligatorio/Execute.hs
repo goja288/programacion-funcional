@@ -93,12 +93,33 @@ execute m (For a1 a2 a3 st) s
 	| otherwise = let 
 				dupla1 = eval m a1
 				in if (evalError (fst dupla1)) then
-							(m, s ++ ((fst dupla1) Map.! "-1"))
+							(fst dupla1, s ++ ((fst dupla1) Map.! "-1"))
 						else
 							execute''' (fst dupla1) a2 a3 st s
 
 
--- While 
+-- While Expr Statment
+execute m (While a st) s
+	| evalError m  == True = (m, s) 
+	| evalExit m  == True = (m, s)
+	| otherwise = let 
+				dupla = eval m a
+				in if (evalError (fst dupla)) then
+						(fst dupla, s ++ ((fst dupla) Map.! "-1"))
+					else
+						if (toBool (snd dupla)) then
+							let 
+							result = execute (fst dupla) st s
+							in if (evalError (fst result)) then
+									result
+								else
+									if (evalExit (fst result)) then
+										result
+									else
+										execute (fst result) (While a st) (snd result)
+						else
+							(fst dupla, s)
+
 
 
 
