@@ -36,7 +36,7 @@ procesarBeginsEnds awp salida memoria =
 		let 
 		listaPatronAccion = awkiProgToList awp
 		in if (not(Map.member "-1" memoria)) then
-			-- let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
+			-- let res = ejecutarPatronStatement memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
 				recorrerPatronStatement memoria "" listaPatronAccion salida
 			else
 				(memoria,salida)
@@ -79,7 +79,7 @@ procesarLinea awp salida lineas indice memoria
 		
 		listaPatronAccion = awkiProgToList awp
 		in if (not(Map.member "-1" memoria4)) then			
-			-- let res = aux2 memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
+			-- let res = ejecutarPatronStatement memoria linea salida (Pat (Lit 1),Sequence [Print [Field (Lit 0)]]) -- TODO !!!!!!! CORREGIR ESTO PARA QUE RECORRA TODO EL PROGRAMA
 			let 
 			res = recorrerPatronStatement memoria4 linea listaPatronAccion (salida)
 			in if (Map.member "-1" (fst res)) then
@@ -105,30 +105,30 @@ recorrerPatronStatement :: Map String String -> String -> [(Patron,Statement)] -
 recorrerPatronStatement memoria linea awkiList salida 
 	| evalError memoria  == True = (memoria, salida)
 	| length awkiList > 1 = 
-			let dupla =  aux2 memoria linea salida (head awkiList)
+			let dupla =  ejecutarPatronStatement memoria linea salida (head awkiList)
 			in 
 				if (evalError (fst dupla) == True) then 
 					dupla
 				else
 					recorrerPatronStatement (fst dupla) linea (tail awkiList) (snd dupla)	
-	| length awkiList == 1 = aux2 memoria linea salida (head awkiList)
+	| length awkiList == 1 = ejecutarPatronStatement memoria linea salida (head awkiList)
 	| length awkiList == 0 = (memoria,salida)
 
 
 
-aux2 :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
-aux2 memoria linea salida (BEGIN,st) = 
+ejecutarPatronStatement :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
+ejecutarPatronStatement memoria linea salida (BEGIN,st) = 
 	if ((Map.member "-1" memoria) || (Map.member "-2" memoria)) then
 		(memoria,salida)
 	else
 		(execute memoria st (salida))
-aux2 memoria linea salida (END,st) =  
+ejecutarPatronStatement memoria linea salida (END,st) =  
 	if ((Map.member "-1" memoria)  || (Map.member "-2" memoria)) then -- TODO NO ESTA ESPECIFICADO EN LA LETRA SI HAY UN exit EN LA SECCION END
 		(memoria,salida)
 	else
 		(execute memoria st (salida))
 
-aux2 memoria linea salida (Pat e,st) =
+ejecutarPatronStatement memoria linea salida (Pat e,st) =
 	let 
 	dupla = eval memoria e -- -> (Map String String, Valor)
 	resExpr = toBool (snd dupla)
