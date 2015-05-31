@@ -98,6 +98,7 @@ execute m (For a1 a2 a3 st) s
 							execute''' (fst dupla1) a2 a3 st s
 
 
+-- While 
 
 
 
@@ -193,8 +194,11 @@ execute''' m a2 a3 st s
 					  				body
 					  			else
 					  				if (evalError (fst inc)) then
-					  					(fst inc, s ++ ((fst inc) Map.! "-1"))
+					  					(fst inc, (snd body) ++ ((fst inc) Map.! "-1"))
 					  				else
-					  					execute''' (fst inc) a2 a3 st (snd body)
+					  					if (evalExit (fst inc)) then
+					  						(fst inc, snd body)
+					  					else
+					  						execute''' (fst inc) a2 a3 st (snd body)
 					  	else
 					  		(fst dupla1, s)
