@@ -126,7 +126,7 @@ execute m (DoWhile st a) s
 	| evalError m  == True = (m, s) 
 	| evalExit m  == True = (m, s)
 	| otherwise = let dupla = execute m st s
-				in if(evalError (fst dupla)) then
+				in if((evalError (fst dupla))|| (evalExit (fst dupla))) then
 						dupla
 					else
 						let 
