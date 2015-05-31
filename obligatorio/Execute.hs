@@ -122,6 +122,29 @@ execute m (While a st) s
 
 
 
+execute m (DoWhile st a) s
+	| evalError m  == True = (m, s) 
+	| evalExit m  == True = (m, s)
+	| otherwise = let dupla = execute m st s
+				in if(evalError (fst dupla)) then
+						dupla
+					else
+						let 
+						result = eval (fst dupla) a
+						in if(evalError (fst result)) then
+								(fst result, s ++ ((fst result) Map.! "-1"))
+							else
+								if (toBool (snd result)) then
+									execute (fst result) (DoWhile st a) (snd dupla)	
+								else 
+									(fst result, s)
+
+
+
+
+
+
+
 
 
 
