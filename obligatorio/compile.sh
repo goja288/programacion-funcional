@@ -4,7 +4,7 @@ rm *.o
 rm *.hi
 
 # build
-ghc -o awki Awki.hs
+#ghc -o awki Awki.hs
 
 # tests
 cd tests

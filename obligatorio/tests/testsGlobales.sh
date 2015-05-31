@@ -102,101 +102,118 @@ progs[65]='END { print a }; BEGIN { a = 28 * 2 }; END { print 45 }; 1 == 1 { pri
 # Conjunto 4 #
 ##############
 
-#progs[80]='(NR >= 5) { f = 1; do { if ($f != "") print $f; ++f } while (f <= 3) }'
-# progs[81]='(NR <= 5) { f = 1; do { if ($f != "") print $f; ++f } while (f <= 3) }'
-# progs[82]='(NR >= 5) { f = 1; do { if ($f == "") print $f; ++f } while (f <= 3) }'
-# progs[83]='(NR >= 5) { f = 1; do { if ($f != "") print f; ++f } while (f <= 3) }'
-# progs[84]='(NR >= 5) { f = 1; do { if ($f != "") print $f; f++ } while (f <= 3) }'
-# progs[85]='(NR >= 5) { f = 5; do { if ($f != "") print $f; f-- } while (f >= 3) }'
-# progs[86]='(NR >= 5) { f = 3; do { if ($f != "") print $f; f-- } while (f >= 0) }'
-# progs[87]='(NR >= 5) { f = 5; do { if ($f != "") print $f; --f } while (f >= 3) }'
-# progs[88]='(NR >= 5) { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }'
-# progs[89]='(NR >= 5) { f = 5; do { if ($f != "") print f - f; --f } while (f >= 3) }'
-# progs[90]='(NR >= 5) { f = 5; do { if ($f != "") print f * f; --f } while (f >= 3) }'
-# progs[91]='(NR >= 5) { f = 5; do { if ($f != "") print f / f; --f } while (f >= 3) }'
-# progs[92]='(NR >= 5) { f = 5; do { if ($f != "") print f + f; --f } while (!(f >= 3)) }'
-# progs[93]='BEGIN { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NR >= 5) { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }'
-# progs[93]='BEGIN { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NR >= 5) { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (f = 1) { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }'
- progs[94]='BEGIN {if (1>o) {print "hola"} else {print "chau"}}'
- progs[95]='BEGIN {if (a = 1>0) {print a} else {print "chau"}}'
-# progs[96]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
-# progs[97]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "No" && PRINT == "YES" ) print $0 }'
-# progs[98]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YSO"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
-# progs[99]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YES"; PRINT = "ES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
-# progs[100]='END { exit; f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
-# progs[101]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {exit;}; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
-# progs[102]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
- progs[103]='{if (NR > 1) exit; print }; END {print "The End" }'
- progs[104]='BEGIN {if (NR > 2) exit; print }; END {print "The End" }'
- progs[105]='(NR > 1) {if (NR > 1) exit; print $1 }; END {print "The End" }'
- progs[106]='END {if (NR > 1) exit; print }; END {print "The End" }'
- progs[107]='BEGIN {if (NF > 1) exit; print }; BEGIN {print "The End" }'
- progs[108]='1 {if (NF > 1) exit; print }; END {print "The End" }'
+progs[80]='(NR >= 5) { f = 1; do { if ($f != "") print $f; ++f } while (f <= 3) }'
+progs[81]='(NR <= 5) { f = 1; do { if ($f != "") print $f; ++f } while (f <= 3) }'
+progs[82]='(NR >= 5) { f = 1; do { if ($f == "") print $f; ++f } while (f <= 3) }'
+progs[83]='(NR >= 5) { f = 1; do { if ($f != "") print f; ++f } while (f <= 3) }'
+progs[84]='(NR >= 5) { f = 1; do { if ($f != "") print $f; f++ } while (f <= 3) }'
+progs[85]='(NR >= 5) { f = 5; do { if ($f != "") print $f; f-- } while (f >= 3) }'
+progs[86]='(NR >= 5) { f = 3; do { if ($f != "") print $f; f-- } while (f >= 0) }'
+progs[87]='(NR >= 5) { f = 5; do { if ($f != "") print $f; --f } while (f >= 3) }'
+progs[88]='(NR >= 5) { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }'
+progs[89]='(NR >= 5) { f = 5; do { if ($f != "") print f - f; --f } while (f >= 3) }'
+progs[90]='(NR >= 5) { f = 5; do { if ($f != "") print f * f; --f } while (f >= 3) }'
+progs[91]='(NR >= 5) { f = 5; do { if ($f != "") print f / f; --f } while (f >= 3) }'
+progs[92]='(NR >= 5) { f = 5; do { if ($f != "") print f + f; --f } while (!(f >= 3)) }'
+progs[93]='BEGIN { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NR >= 5) { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }'
+progs[93]='BEGIN { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NR >= 5) { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (f = 1) { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }'
+progs[94]='BEGIN {if (1>o) {print "hola"} else {print "chau"}}'
+progs[95]='BEGIN {if (a = 1>0) {print a} else {print "chau"}}'
+progs[96]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
+progs[97]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "No" && PRINT == "YES" ) print $0 }'
+progs[98]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YSO"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
+progs[99]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YES"; PRINT = "ES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
+progs[100]='END { exit; f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {}; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
+progs[101]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; (NF > 0) {exit;}; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
+progs[102]='END { f = 5; do { if ($f != "") print f + f; --f } while (f >= 3) }; BEGIN { BODY = "YES"; PRINT = "YES"; }; END { if ( BODY == "YES" && PRINT == "YES" ) print $0 }'
+progs[103]='{if (NR > 1) exit; print }; END {print "The End" }'
+progs[104]='BEGIN {if (NR > 2) exit; print }; END {print "The End" }'
+progs[105]='(NR > 1) {if (NR > 1) exit; print $1 }; END {print "The End" }'
+progs[106]='END {if (NR > 1) exit; print }; END {print "The End" }'
+progs[107]='BEGIN {if (NF > 1) exit; print }; BEGIN {print "The End" }'
+progs[108]='1 {if (NF > 1) exit; print }; END {print "The End" }'
 
- progs[109]='{if (NR < 1) exit; print }; END {print "The End" }'
- progs[110]='BEGIN {if (NR < 2) exit; print }; END {print "The End" }'
- progs[111]='(NR < 1) {if (NR < 1) exit; print $1 }; END {print "The End" }'
- progs[112]='END {if (NR < 1) exit; print }; END {print "The End" }'
- progs[113]='BEGIN {if (NF < 1) exit; print }; BEGIN {print "The End" }'
- progs[114]='1 {if (NF < 1) exit; print }; END {print "The End" }'
+progs[109]='{if (NR < 1) exit; print }; END {print "The End" }'
+progs[110]='BEGIN {if (NR < 2) exit; print }; END {print "The End" }'
+progs[111]='(NR < 1) {if (NR < 1) exit; print $1 }; END {print "The End" }'
+progs[112]='END {if (NR < 1) exit; print }; END {print "The End" }'
+progs[113]='BEGIN {if (NF < 1) exit; print }; BEGIN {print "The End" }'
+progs[114]='1 {if (NF < 1) exit; print }; END {print "The End" }'
 
- progs[115]='{if (NR == 1) exit; print }; END {print "The End" }'
- progs[116]='BEGIN {if (NR == 2) exit; print }; END {print "The End" }'
- progs[117]='(NR == 1) {if (NR == 1) exit; print $1 }; END {print "The End" }'
- progs[118]='END {if (NR == 1) exit; print }; END {print "The End" }'
- progs[119]='BEGIN {if (NF == 1) exit; print }; BEGIN {print "The End" }'
- progs[120]='1 {if (NF == 1) exit; print }; END {print "The End" }'
+progs[115]='{if (NR == 1) exit; print }; END {print "The End" }'
+progs[116]='BEGIN {if (NR == 2) exit; print }; END {print "The End" }'
+progs[117]='(NR == 1) {if (NR == 1) exit; print $1 }; END {print "The End" }'
+progs[118]='END {if (NR == 1) exit; print }; END {print "The End" }'
+progs[119]='BEGIN {if (NF == 1) exit; print }; BEGIN {print "The End" }'
+progs[120]='1 {if (NF == 1) exit; print }; END {print "The End" }'
 
- progs[121]='{if (NR != 1) exit; print }; END {print "The End" }'
- progs[122]='BEGIN {if (NR != 2) exit; print }; END {print "The End" }'
- progs[123]='(NR != 1) {if (NR != 1) exit; print $1 }; END {print "The End" }'
- progs[124]='END {if (NR != 1) exit; print }; END {print "The End" }'
- progs[125]='BEGIN {if (NF != 1) exit; print }; BEGIN {print "The End" }'
- progs[126]='1 {if (NF != 1) exit; print }; END {print "The End" }'
+progs[121]='{if (NR != 1) exit; print }; END {print "The End" }'
+progs[122]='BEGIN {if (NR != 2) exit; print }; END {print "The End" }'
+progs[123]='(NR != 1) {if (NR != 1) exit; print $1 }; END {print "The End" }'
+progs[124]='END {if (NR != 1) exit; print }; END {print "The End" }'
+progs[125]='BEGIN {if (NF != 1) exit; print }; BEGIN {print "The End" }'
+progs[126]='1 {if (NF != 1) exit; print }; END {print "The End" }'
 
- progs[127]='{if (NR > -1) exit; print }; END {print "The End" }'
- progs[128]='BEGIN {if (NR > +2) exit; print }; END {print "The End" }'
- progs[129]='(NR > 1) {if (+2 > +2) exit; print $1 }; END {print "The End" }'
- progs[130]='END {if (+2 > -2) exit; print }; END {print "The End" }'
- progs[131]='BEGIN {if (-2 > +2) exit; print }; BEGIN {print "The End" }'
- progs[132]='1 {if (!1) exit; print }; END {print "The End" }'
+progs[127]='{if (NR > -1) exit; print }; END {print "The End" }'
+progs[128]='BEGIN {if (NR > +2) exit; print }; END {print "The End" }'
+progs[129]='(NR > 1) {if (+2 > +2) exit; print $1 }; END {print "The End" }'
+progs[130]='END {if (+2 > -2) exit; print }; END {print "The End" }'
+progs[131]='BEGIN {if (-2 > +2) exit; print }; BEGIN {print "The End" }'
+progs[132]='1 {if (!1) exit; print }; END {print "The End" }'
 
- progs[133]='BEGIN {if (1) exit; print }; END {print "The End" }'
- progs[134]='BEGIN {if (1) exit; print }; END {exit}'
- progs[135]='BEGIN {if (!1) exit; print }; END {print "The End" }'
- progs[136]='BEGIN {if (!1) exit; print }; END {exit}'
- progs[137]='BEGIN {if (NF == 1) exit; print }; BEGIN {print "The End" }'
- progs[138]='BEGIN { print NF }; BEGIN {print "The End" }'
- progs[139]='BEGIN {if (NR != 2) exit; print }; END {print "The End" }; {}'
+progs[133]='BEGIN {if (1) exit; print }; END {print "The End" }'
+progs[134]='BEGIN {if (1) exit; print }; END {exit}'
+progs[135]='BEGIN {if (!1) exit; print }; END {print "The End" }'
+progs[136]='BEGIN {if (!1) exit; print }; END {exit}'
+progs[137]='BEGIN {if (NF == 1) exit; print }; BEGIN {print "The End" }'
+progs[138]='BEGIN { print NF }; BEGIN {print "The End" }'
+progs[139]='BEGIN {if (NR != 2) exit; print }; END {print "The End" }; {}'
 
-# progs[140]='BEGIN {print "\t"}'
- #progs[141]='BEGIN {print "hoa","\t","paa"}'
- #progs[142]='BEGIN { print "\t","hoa","\t" }'
- #progs[143]='BEGIN { print "\t","\t","\t" }'
- #progs[144]='BEGIN { print "\t","\t","hoa" }'
- #progs[145]='BEGIN { print "que pa\tjeje" }'
+progs[140]='BEGIN {print "\t"}'
+progs[141]='BEGIN {print "hoa","\t","paa"}'
+progs[142]='BEGIN { print "\t","hoa","\t" }'
+progs[143]='BEGIN { print "\t","\t","\t" }'
+progs[144]='BEGIN { print "\t","\t","hoa" }'
+progs[145]='BEGIN { print "que pa\tjeje" }'
 
-# progs[146]='BEGIN {print "\n"}'
-# progs[147]='BEGIN {print "hoa","\n","paa"}'
-# progs[148]='BEGIN { print "\n","hoa","\n" }'
-# progs[149]='BEGIN { print "\n","\n","\n" }'
-# progs[150]='BEGIN { print "\n","\n","hoa" }'
-# progs[151]='BEGIN { print "que pa\njeje" }'
+progs[146]='BEGIN {print "\n"}'
+progs[147]='BEGIN {print "hoa","\n","paa"}'
+progs[148]='BEGIN { print "\n","hoa","\n" }'
+progs[149]='BEGIN { print "\n","\n","\n" }'
+progs[150]='BEGIN { print "\n","\n","hoa" }'
+progs[151]='BEGIN { print "que pa\njeje" }'
+
+##############
+# Conjunto 5 #
+##############
+
+# Comprobar que si el exit es en el BEGIN no se lee el archivo de entrada - no se cargan los $
+progs[160]='BEGIN { exit }; END { print $0 }'
+progs[161]='END { print $0 }'
+# Revisa que aunque no hay patrones Pat igual se leen las lineas (Se que ya hay un test muy similar, pero no recuerdo cual es)
+progs[162]='BEGIN { print "Iniciando..." }; END { print "Muy bien"; print $0 }'
 
 
 IFS="" # to avoid spaces messing the array...
 
-echo -e "\n############\n# Globales #\n############\n"
-for prog in ${progs[@]}
+# Multiples archivos de entrada
+entradas[0]='entradas/entrada.txt'
+entradas[1]='entradas/sample.txt'
+
+echo -e "\n# Globales \n\n"
+for entrada in ${entradas[@]}
 do
-	#echo "running $prog ..."
-  	
-  	awk "$prog" entradas/entrada.txt > salidas/awk-output-testsGlobales.txt
-  	cat entradas/entrada.txt | ./../awki "$prog" > salidas/awki-output-testsGlobales.txt
-  	diff -b salidas/awk-output-testsGlobales.txt salidas/awki-output-testsGlobales.txt
-  	
+	echo -e "\t# Entrada $entrada \n"
+	for prog in ${progs[@]}
+	do
+	  #echo "running $prog ..."
+	  awk "$prog" "$entrada" > salidas/awk-output-testsGlobales.txt
+	  #echo "running (AWKI) $prog ..."
+	  cat "$entrada" | ./../awki "$prog" > salidas/awki-output-testsGlobales.txt
+	  diff -b salidas/awk-output-testsGlobales.txt salidas/awki-output-testsGlobales.txt
+	done
 done
-echo -e "\n#######\n# Fin #\n#######\n"
+echo -e "\n# Fin \n\n"
 
 # cleanup
 rm salidas/awki-output-testsGlobales.txt
