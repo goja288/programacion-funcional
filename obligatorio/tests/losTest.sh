@@ -4,7 +4,9 @@ rm ../*.o
 rm ../*.hi
 
 # build
+cd ..
 ghc -o awki Awki.hs
+cd tests
 
 # run tests
 
@@ -88,7 +90,7 @@ IFS="" # to avoid spaces messing the array...
 for prog in ${progs[@]}
 do
   echo "running $prog ..."
-  awk "$prog" entradas/ej.txt > awk-output-myn.txt
+  awk "$prog" entradas/ej.txt > salidas/awk-output-myn.txt
   cat entradas/ej.txt | ./../awki "$prog" > salidas/awki-output-myn.txt
   diff -b salidas/awk-output-myn.txt salidas/awki-output-myn.txt
 done
