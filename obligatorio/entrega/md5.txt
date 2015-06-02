@@ -1,5 +1,0 @@
-b46a6b00caad3780476b30c042abad18  Eval.hs
-cf3605865a161906a96529cf66dad166  Execute.hs
-285389c68f81cc032cd259d03639aae6  RunAwki.hs
-f25830a5c6ab44d0a34b1e4c657fdad6  TareaFP.tar.gz
-f25830a5c6ab44d0a34b1e4c657fdad6  —- EL ENTREGADO
