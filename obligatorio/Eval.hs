@@ -175,7 +175,7 @@ eval m (Op2 And a b)
 	| evalError m  == True = (m, (Num 0))
 	| evalError (fst (eval m a)) == True = eval m a
 	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
-	| (toBool (snd (eval m a))) && (toBool (snd (eval (fst (eval m a)) b))) = 
+	| (toBool (Num (toInt (snd (eval m a)))) && (toBool (Num (toInt (snd (eval (fst (eval m a)) b)))))) = 
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
@@ -190,7 +190,7 @@ eval m (Op2 Or a b)
 	| evalError m  == True = (m, (Num 0))
 	| evalError (fst (eval m a)) == True = eval m a
 	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b	
-	| (toBool (snd (eval m a))) || (toBool (snd (eval (fst (eval m a)) b))) = 
+	| (toBool (Num (toInt (snd (eval m a)))) || (toBool (Num (toInt (snd (eval (fst (eval m a)) b)))))) = 
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
