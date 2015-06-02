@@ -86,8 +86,8 @@ progs[71]='BEGIN {print "Begin"; exit; var = 5}; 1 {var--; print var}; END {prin
 
 # comparacion de strings
 progs[153]='{var = "pepe"; var2 = "es"; var3 = (var && var2); print var3 }'
-progs[154]='{var = "pepe"; var2 = "es";  var3 = (var && var2)  ; print var3}'
-progs[155]='{var = "pepe"; var2 = "es";  var3 = (var && var2)  ; print var3}'
+progs[154]='{var = "es"; var2 = "pepe";  var3 = (var && var2)  ; print var3}'
+progs[155]='{var = "pepe"; var2 = "pepe";  var3 = (var && var2)  ; print var3}'
 progs[156]='{var = "winnie"; var2 = "winnie"; var3 = (var && var2)  ; print var3}'
 progs[160]='{var = "winnie"; var2 = "winnie"; var3 = (var || var2)  ; print var3}'
 
