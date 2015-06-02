@@ -178,6 +178,20 @@ eval m (Op2 And a b)
 	| evalError m  == True = (m, (Num 0))
 	| evalError (fst (eval m a)) == True = eval m a
 	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b
+	| (toIntMb (Str (show (snd (eval m a))))) == Nothing || (toIntMb (Str (show (snd (eval (fst (eval m a)) b))))) == Nothing =
+		if ((toBool (snd (eval m a))) && (toBool (snd (eval (fst (eval m a)) b)))) then
+			let 
+			dupla1 = eval m a
+			dupla2 = eval (fst dupla1) b
+			in (fst dupla2, Num 1)
+		else
+			let 
+			dupla1 = eval m a
+			dupla2 = eval (fst dupla1) b
+			in if ((toBool (snd dupla1)) == False) then
+					(fst dupla1, Num 0)
+				else
+					(fst dupla2, Num 0)
 	| (toBool (Num (toInt (snd (eval m a)))) && (toBool (Num (toInt (snd (eval (fst (eval m a)) b)))))) = 
 		let 
 		dupla1 = eval m a
@@ -192,10 +206,25 @@ eval m (Op2 And a b)
 			else
 				(fst dupla2, Num 0)
 
+
 eval m (Op2 Or a b)
 	| evalError m  == True = (m, (Num 0))
 	| evalError (fst (eval m a)) == True = eval m a
 	| evalError (fst (eval (fst (eval m a)) b)) == True = eval (fst (eval m a)) b	
+	| (toIntMb (Str (show (snd (eval m a))))) == Nothing || (toIntMb (Str (show (snd (eval (fst (eval m a)) b))))) == Nothing =
+		if ((toBool (snd (eval m a))) || (toBool (snd (eval (fst (eval m a)) b)))) then 
+			let 
+			dupla1 = eval m a
+			dupla2 = eval (fst dupla1) b
+			in if ((toBool (snd dupla1)) == True) then
+					(fst dupla1, Num 1)
+				else
+					(fst dupla2, Num 1)
+		else
+			let 
+			dupla1 = eval m a
+			dupla2 = eval (fst dupla1) b
+			in (fst dupla2, Num 0)
 	| (toBool (Num (toInt (snd (eval m a)))) || (toBool (Num (toInt (snd (eval (fst (eval m a)) b)))))) = 
 		let 
 		dupla1 = eval m a
@@ -204,7 +233,6 @@ eval m (Op2 Or a b)
 				(fst dupla1, Num 1)
 			else
 				(fst dupla2, Num 1)
-
 	| otherwise =
 		let 
 		dupla1 = eval m a
