@@ -259,7 +259,7 @@ eval m (PP False True s)
 	| evalError m  == True = (m, (Num 0))
 	| otherwise =  
 		let dupla1 = eval m (Op2 Add (Var s) (Lit 1)) 
-		in (Map.insert s (show (snd dupla1)) (fst dupla1), snd (eval m (Var s)))
+		in (Map.insert s (show (snd dupla1)) (fst dupla1), Num (toInt (snd (eval m (Var s)))))
 	
 eval m (PP True False s) 
 	| evalError m  == True = (m, (Num 0))
@@ -271,7 +271,7 @@ eval m (PP False False s)
 	| evalError m  == True = (m, (Num 0))
 	| otherwise =
 		let dupla1 = eval m (Op2 Add (Var s) (Lit (-1)))
-		in (Map.insert s (show (snd dupla1)) (fst dupla1), snd (eval m (Var s)))
+		in (Map.insert s (show (snd dupla1)) (fst dupla1), Num (toInt (snd (eval m (Var s)))))
 -- eval (Map.fromList [("$1", "10")]) (PP False False "$1") // Deberia guardar 9 y devolver 10
 
 -- DEFINIMOS LA EXPESION "FIELD EXPR" ------------------------------------------------------------------------------------------
