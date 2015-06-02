@@ -244,7 +244,7 @@ eval m (Accum b s a)
 	| evalError m  == True = (m, (Num 0))
 	| evalError (fst (eval m a)) == True = eval m a
 	| otherwise = 
-		let dupla1 = eval m (Op2 b (Var s) a)
+		let dupla1 = eval (fst (eval m a)) (Op2 b (Var s) a)
 		in (Map.insert s (show (snd (dupla1))) (fst dupla1), (snd dupla1))
 -- eval (Map.fromList [("$1", "10")]) (Accum Add "$1" (Lit (Num 1))) // Deberia Guardar 11 y devolver 11
 
