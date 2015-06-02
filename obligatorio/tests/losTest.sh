@@ -99,6 +99,30 @@ progs[164]='{print -20 % (3)}'
 progs[165]='{print -20 % (-3)}'
 
 
+# Comparaciones
+progs[170]='{var = 2; var2 = 8; var3 = (var > var2)  ; print var3}'
+progs[171]='{var = 8; var2 = 2; var3 = (var > var2)  ; print var3}'
+progs[172]='{var = 2; var2 = 8; var3 = (var >= var2)  ; print var3}'
+progs[173]='{var = 8; var2 = 2; var3 = (var >= var2)  ; print var3}'
+progs[174]='{var = 5; var2 = 5; var3 = (var >= var2)  ; print var3}'
+progs[175]='{var = 2; var2 = 8; var3 = (var >= var2)  ; print var3}'
+progs[176]='{var = 8; var2 = 2; var3 = (var >= var2)  ; print var3}'
+progs[177]='{var = 2; var2 = 8; var3 = (var < var2)  ; print var3}'
+progs[178]='{var = 8; var2 = 2; var3 = (var < var2)  ; print var3}'
+progs[179]='{var = 5; var2 = 5; var3 = (var <= var2)  ; print var3}'
+progs[180]='{var = "aa"; var2 = "zz"; var3 = (var > var2)  ; print var3}'
+progs[181]='{var = "zz"; var2 = "aa"; var3 = (var > var2)  ; print var3}'
+progs[182]='{var = "aa"; var2 = "zz"; var3 = (var >= var2)  ; print var3}'
+progs[183]='{var = "zz"; var2 = "aa"; var3 = (var >= var2)  ; print var3}'
+progs[184]='{var = "ww"; var2 = "ww"; var3 = (var >= var2)  ; print var3}'
+progs[185]='{var = "aa"; var2 = "zz"; var3 = (var >= var2)  ; print var3}'
+progs[186]='{var = "zz"; var2 = "aa"; var3 = (var >= var2)  ; print var3}'
+progs[187]='{var = "aa"; var2 = "zz"; var3 = (var < var2)  ; print var3}'
+progs[188]='{var = "zz"; var2 = "aa"; var3 = (var < var2)  ; print var3}'
+progs[189]='{var = "ww"; var2 = "ww"; var3 = (var <= var2)  ; print var3}'
+
+
+
 IFS="" # to avoid spaces messing the array...
 
 for prog in ${progs[@]}
