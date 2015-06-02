@@ -73,7 +73,10 @@ eval m (Op2 Mod a b)
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
-		in (fst dupla2, Num (mod  (toInt (snd dupla1)) (toInt (snd dupla2))))
+		in if (toBool (snd (eval (fst dupla2) (Op2 Lt (Lit (snd dupla2)) (Lit 0))))) then
+		  		(fst dupla2, Num (mod  (toInt (snd dupla1)) (-1 * (toInt (snd dupla2)))))
+		  	else
+		  		(fst dupla2, Num (mod  (toInt (snd dupla1)) (toInt (snd dupla2))))
 	| otherwise = 
 		let 
 		dupla1 = eval m a
@@ -184,7 +187,10 @@ eval m (Op2 And a b)
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
-		in (fst dupla2, Num 0)
+		in if ((toBool (snd dupla1)) == False) then
+				(fst dupla1, Num 0)
+			else
+				(fst dupla2, Num 0)
 
 eval m (Op2 Or a b)
 	| evalError m  == True = (m, (Num 0))
@@ -194,7 +200,11 @@ eval m (Op2 Or a b)
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
-		in (fst dupla2, Num 1)
+		in if ((toBool (snd dupla1)) == True) then
+				(fst dupla1, Num 1)
+			else
+				(fst dupla2, Num 1)
+
 	| otherwise =
 		let 
 		dupla1 = eval m a
