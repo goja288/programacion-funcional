@@ -82,6 +82,7 @@ progs[68]='(x = 0) && (x = 7) {print x}'
 progs[69]='(x = 1) && (x = 7) {print x}'
 progs[70]='BEGIN {i = 4; while (i != 5) {i--; print $i}}'
 progs[71]='BEGIN {print "Begin"; exit; var = 5}; 1 {var--; print var}; END {print var; exit; print "End"}'
+
 #progs[72]='BEGIN {myVar = 72}; ($3 == 34) && ($4 == 34) {print $1}; ($3 < 87) || ($4 <315) {i = 22; while (i < 550) {print $1; i++}; print myVar; var2 += (517 * ((myVar || 45) + (var && (3 < 7))))}; $1 == "games" {print myVar, var, (mayVar+=(var = var)); var3++}; $1 != "sebarl" {print "blah", "bleh", (5+7),(537-2+3*3)}; 1 {a = 3; while (a<50) {h = 5; do{for(n = h; n<20;n+=3){print a, h, n, $(a*h*n)};h++} while(h<14); a++}}; $2 == "x" {if (var3211) {if (1) {print "blah"} else {print "blehman"}} else { if ("blah") {print "ohyeahman"} else {print "ohnoes!"}}}; END {blahman557 = "SPAMMASTER"; exit}'
 
 # comparacion de strings
@@ -121,6 +122,35 @@ progs[187]='{var = "aa"; var2 = "zz"; var3 = (var < var2)  ; print var3}'
 progs[188]='{var = "zz"; var2 = "aa"; var3 = (var < var2)  ; print var3}'
 progs[189]='{var = "ww"; var2 = "ww"; var3 = (var <= var2)  ; print var3}'
 
+progs[213]='{var = "aa"; var2 = "zz"; var3 = (var == var2)  ; print var3}'
+progs[214]='{var = "zz"; var2 = "aa"; var3 = (var == var2)  ; print var3}'
+progs[215]='{var = "ww"; var2 = "ww"; var3 = (var == var2)  ; print var3}'
+
+progs[208]='{var = "hola"; var2 = 8; var3 = (var > var2)  ; print var3}'
+progs[209]='{var = 8; var2 = "hola"; var3 = (var > var2)  ; print var3}'
+progs[210]='{var = "hola"; var2 = 8; var3 = (var >= var2)  ; print var3}'
+progs[211]='{var = 8; var2 = "hola"; var3 = (var >= var2)  ; print var3}'
+progs[212]='{var = 5; var2 = 5; var3 = (var >= var2)  ; print var3}'
+progs[190]='{var = "hola"; var2 = 8; var3 = (var >= var2)  ; print var3}'
+progs[191]='{var = 8; var2 = "hola"; var3 = (var >= var2)  ; print var3}'
+progs[192]='{var = "hola"; var2 = 8; var3 = (var < var2)  ; print var3}'
+progs[193]='{var = 8; var2 = "hola"; var3 = (var < var2)  ; print var3}'
+progs[194]='{var = 5; var2 = 5; var3 = (var <= var2)  ; print var3}'
+
+progs[195]='{var = ""; var2 = "zz"; var3 = (var > var2)  ; print var3}'
+progs[196]='{var = "zz"; var2 = ""; var3 = (var > var2)  ; print var3}'
+progs[197]='{var = ""; var2 = "zz"; var3 = (var >= var2)  ; print var3}'
+progs[198]='{var = "zz"; var2 = "aa"; var3 = (var >= var2)  ; print var3}'
+progs[199]='{var = ""; var2 = ""; var3 = (var >= var2)  ; print var3}'
+progs[200]='{var = ""; var2 = "zz"; var3 = (var >= var2)  ; print var3}'
+progs[201]='{var = "zz"; var2 = ""; var3 = (var >= var2)  ; print var3}'
+progs[202]='{var = ""; var2 = "zz"; var3 = (var < var2)  ; print var3}'
+progs[203]='{var = "zz"; var2 = ""; var3 = (var < var2)  ; print var3}'
+progs[204]='{var = ""; var2 = ""; var3 = (var <= var2)  ; print var3}'
+
+progs[205]='{var = ""; var2 = "zz"; var3 = (var == var2)  ; print var3}'
+progs[206]='{var = "zz"; var2 = ""; var3 = (var == var2)  ; print var3}'
+progs[207]='{var = ""; var2 = ""; var3 = (var == var2)  ; print var3}'
 
 
 IFS="" # to avoid spaces messing the array...
