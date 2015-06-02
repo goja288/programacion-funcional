@@ -1,3 +1,5 @@
+rm -rf entrega/
+mkdir entrega/
 cp Eval.hs entrega/ 
 cp Execute.hs entrega/
 cp RunAwki.hs entrega/
