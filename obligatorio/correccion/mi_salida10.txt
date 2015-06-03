@@ -1,0 +1,5 @@
+probando el error division por 0
+0
+0
+0
+Error: Division por 0
