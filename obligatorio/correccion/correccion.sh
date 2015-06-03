@@ -6,7 +6,7 @@
 ../awki "$(cat 6.awk)" < 6.txt > mi_salida6.txt
 ../awki "$(cat 7.awk)" < 7.txt > mi_salida7.txt
 ../awki "$(cat 8.awk)" < 8.txt > mi_salida8.txt
-../awki "$(cat 9.awk)" < 9.txt >mi_salida9.txt
+../awki "$(cat 9.awk)" < 9.txt > mi_salida9.txt
 ../awki "$(cat 10.awk)" < 10.txt > mi_salida10.txt
 
 
@@ -15,7 +15,7 @@ diff -b -E mi_salida1.txt s1.txt
 echo "** TEST 2"
 diff -b -E mi_salida2.txt s2.txt
 echo "** TEST 3"
-diff -b -E mi_salida3.txt s2.txt
+diff -b -E mi_salida3.txt s3.txt
 echo "** TEST 4"
 diff -b -E mi_salida4.txt s4.txt
 echo "** TEST 5"
