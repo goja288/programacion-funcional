@@ -9,7 +9,7 @@ ghc -o awki Awki.hs
 
 cd correccion/
 
-../awki "$(cat 1.awk)" < 1.txt >mi_salida1.txt
+../awki "$(cat 1.awk)" < 1.txt > mi_salida1.txt
 ../awki "$(cat 2.awk)" < 2.txt > mi_salida2.txt
 ../awki "$(cat 3.awk)" < 3.txt > mi_salida3.txt
 ../awki "$(cat 4.awk)" < 4.txt > mi_salida4.txt
