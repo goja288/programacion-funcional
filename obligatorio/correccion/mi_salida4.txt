@@ -1,3 +1,0 @@
-maximo y minimo de todos los campos
-El minimo es: 	-7
-El maximo es: 	200
