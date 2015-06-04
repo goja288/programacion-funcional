@@ -32,7 +32,7 @@ execute m (Print l) s
 	| evalExit m  == True = (m, s)
 	| otherwise = let hayError = execute' m (Print l) ""
 				in if ((snd hayError) /= "") then
-						((fst hayError), s ++ (show (snd hayError)))
+						((fst hayError), s ++ (snd hayError))
 					else
 						execute'' m (Print l) s
 
