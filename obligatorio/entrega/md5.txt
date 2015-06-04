@@ -1,0 +1,4 @@
+cbf820f63d39ec3c2e67595dd7cde1f1  Eval.hs
+aefc8165ef82d0eb2c5e111d93af5690  Execute.hs
+c78f1ac9b4c72de6771b55f5a6938606  RunAwki.hs
+39495f77388154aa8a5c945eb12c4a89  TareaFP.tar.gz
