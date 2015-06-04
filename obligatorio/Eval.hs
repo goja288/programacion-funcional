@@ -63,7 +63,7 @@ eval m (Op2 Div a b)
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
-		in (Map.insert "-1" "Error: Division por 0\n" (fst dupla2), (Num 0))
+		in (Map.insert "-1" "Error: Division por cero\n" (fst dupla2), (Num 0))
 	
 eval m (Op2 Mod a b)
 	| evalError m  == True = (m, (Num 0))
@@ -78,7 +78,7 @@ eval m (Op2 Mod a b)
 		let 
 		dupla1 = eval m a
 		dupla2 = eval (fst dupla1) b
-		in (Map.insert "-1" "Error: Division por 0\n" (fst dupla2), (Num 0))
+		in (Map.insert "-1" "Error: Division por cero\n" (fst dupla2), (Num 0))
 
 -- VER ALGUN EJEMPLO COMO HIZO EL RESTO CON EL TEMA DE LAS COMPARACIONES, QUE DEVUELVEN?
 eval m (Op2 Lt a b) 
@@ -313,8 +313,11 @@ eval m (PP False False s)
 eval m (Field a)
 	| evalError m  == True = (m, (Num 0))
 	| (toBool (snd (eval (fst (eval m a)) (Op2 Lt (Lit (snd (eval m a))) (Lit (Num 0)))))) == True = (Map.insert "-1" ("Error: Variable Negativa\n") (fst (eval (fst (eval m a)) (Op2 Lt (Lit (snd (eval m a))) (Lit 0)))), Num 0)
-	| otherwise = (eval (fst (eval m a)) (Var (show (snd (eval m a)))))
-	
+	| otherwise = let dupla = (eval (fst (eval m a)) (Var (show (snd (eval m a)))))
+				  in if ((toIntMb (snd dupla)) == Nothing) then
+				  		dupla
+				  	else
+				  		(fst dupla, Num (toInt (snd dupla)))	
 	
 -- PRUEBAS ............................................................................
 -- eval (Map.fromList [("1", "Pepito")]) (Op2 Equal (Lit (Str "")) (Lit ( Str ""))) 

@@ -79,8 +79,13 @@ execute m (If a st1 st2) s
 	| evalExit m  == True = (m, s)
 	| evalError (fst (eval m a)) == True = let dupla = eval m a
 										in (fst dupla, s ++ ((fst dupla) Map.! "-1"))
-	| otherwise = let dupla = eval m a
-				in if ((toBool (snd dupla)) == True) then 
+	| otherwise = let 
+				dupla = eval m a
+				condicion = if ((toIntMb (snd dupla)) == Nothing) then
+								(Str (show (snd dupla)))
+					  		else
+								(Num (toInt (snd dupla)))
+				in if (((toBool condicion)) == True) then 
 						execute (fst dupla) st1	s
 					else
 						execute (fst dupla) st2 s
