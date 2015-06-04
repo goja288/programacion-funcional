@@ -1,8 +1,8 @@
 Suma o multiplica todos los campos de una fila
 6
-15120
+35
 -29700
-6000
+60
 1
 300
 101

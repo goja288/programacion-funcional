@@ -6,6 +6,8 @@ import AwkiSA
 import Data.Map (Map)
 import qualified Data.Map as Map
 
+
+
 import Parser
 import Eval
 import Execute
@@ -13,7 +15,7 @@ import Execute
 runAwki :: AwkiProg -> String -> String
 runAwki awkiProg entrada = 
 	let 
-	memoria = Map.fromList [("NR",show 0),("NF",show 0),("-3",show 0)] -- Inicializo la memoria 
+	memoria = Map.fromList [("NR",Num 0),("NF",Num 0),("-3",Num 0)] -- Inicializo la memoria 
 	lineas = lines entrada -- Tomo la entrada y la separo por lineas
 	--awkiProgOrdenado = ordenarAwkiProg awkiProg 	-- Ordeno el AwkiProg (BEGIN's al ppio, END's al final y el resto en el medio) - NO TIENE MUCHO SENTIDO AHORA
 	awpBEGIN = AwkiProg ( (filter esBegin (awkiProgToList awkiProg)))	-- BEGIN
@@ -26,7 +28,7 @@ runAwki awkiProg entrada =
 	memSinExit = Map.delete "-2" (fst resEXPR)
 
 	resEND = procesarBeginsEnds awpEND (snd resEXPR) memSinExit -- END
-	in (snd resEND)
+	in ((snd resEND))
 
 
 
@@ -34,16 +36,16 @@ sustituirCaracteresEspeciales :: [Char] -> String
 sustituirCaracteresEspeciales [] = []
 sustituirCaracteresEspeciales (x:xs) =
 	if (x == '\n') then
-	 	"\n#." ++ (sustituirCaracteresEspeciales xs)
+	 	"\n" ++ (sustituirCaracteresEspeciales xs)
 	else if (x == '\t') then
-		"\t##" ++ (sustituirCaracteresEspeciales xs)
+		"\t" ++ (sustituirCaracteresEspeciales xs)
 	else
 		x:sustituirCaracteresEspeciales xs 
 
 ----
 -- procesarBeginsEnds
 ----
-procesarBeginsEnds :: AwkiProg -> String -> Map String String -> (Map String String,String)
+procesarBeginsEnds :: AwkiProg -> String -> Map String Valor -> (Map String Valor,String)
 procesarBeginsEnds awp salida memoria =
 		let 
 		listaPatronAccion = awkiProgToList awp
@@ -57,7 +59,7 @@ procesarBeginsEnds awp salida memoria =
 ----
 
 -- 
-procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String String -> (Map String String,String)
+procesarLinea :: AwkiProg -> String -> [String] -> Int -> Map String Valor -> (Map String Valor,String)
 procesarLinea awp salida lineas indice memoria 
 	| (indice >= (length lineas)) = (memoria, salida)
 	| (Map.member "-2" memoria) = (memoria,salida) -- Si hay un exit no sigo procesando las lineas 
@@ -70,12 +72,12 @@ procesarLinea awp salida lineas indice memoria
   
   		duplaMemoriaNfAnterior = definirTope memoria 
   		memoria1 = duplaMemoriaNfAnterior
-  		nfAnterior = show nf	
+  		nfAnterior = nf	
 
 		memoriaConCampos = agregarVariablesCampos campos 1  memoria1
 		memoria2 = memoriaConCampos 
 
-		memoriaAux = Map.insert "0" (linea) memoria2
+		memoriaAux = Map.insert "0" (Str (linea)) memoria2
 		memoria3 = memoriaAux -- Como forzar haskel :S
 
   		-- El -3 guarda la linea anterior
@@ -83,10 +85,10 @@ procesarLinea awp salida lineas indice memoria
 
   		-- actualizo nr y nf y -3
   		indiceInc = indice + 1 
-  		memoriaNR = Map.insert "NR" (show indiceInc) memoria3
-  		memoriaNF = Map.insert "NF" (show (length (words linea))) memoriaNR
-  		memoriaMenos3 = Map.insert "-3" nfAnterior memoriaNF
-  		memoria4 = Map.insert "0" linea memoriaMenos3
+  		memoriaNR = Map.insert "NR" (Num indiceInc) memoria3
+  		memoriaNF = Map.insert "NF" (Num (length (words linea))) memoriaNR
+  		memoriaMenos3 = Map.insert "-3" (Num nfAnterior) memoriaNF
+  		memoria4 = Map.insert "0" (Str linea) memoriaMenos3
 
 		
 		listaPatronAccion = awkiProgToList awp
@@ -96,7 +98,7 @@ procesarLinea awp salida lineas indice memoria
 			res = recorrerPatronStatement memoria4 linea listaPatronAccion (salida)
 			in if (Map.member "-1" (fst res)) then
 		--		-- ERROR
-					(fst res,(snd res))
+					(fst res, (snd res))
 				else
 					let indiceInc = indice + 1 
 					in procesarLinea awp (snd res) lineas indiceInc (fst res)
@@ -106,14 +108,14 @@ procesarLinea awp salida lineas indice memoria
 
 
 
-agregarVariablesCampos :: [String] -> Int -> Map String String -> Map String String
+agregarVariablesCampos :: [String] -> Int -> Map String Valor -> Map String Valor
 agregarVariablesCampos [] _ memoria = memoria
 agregarVariablesCampos (x:xs) indice memoria = do
 	let indiceInc = indice + 1
-	Map.insert (show indice) x (agregarVariablesCampos xs indiceInc memoria )
+	Map.insert (show indice) (Str x) (agregarVariablesCampos xs indiceInc memoria )
 
 
-recorrerPatronStatement :: Map String String -> String -> [(Patron,Statement)] -> String -> (Map String String, String)
+recorrerPatronStatement :: Map String Valor -> String -> [(Patron,Statement)] -> String -> (Map String Valor, String)
 recorrerPatronStatement memoria linea awkiList salida 
 	| evalError memoria  == True = (memoria, salida)
 	| length awkiList > 1 = 
@@ -128,7 +130,7 @@ recorrerPatronStatement memoria linea awkiList salida
 
 
 
-ejecutarPatronStatement :: Map String String -> String -> String -> (Patron,Statement) -> (Map String String,String)
+ejecutarPatronStatement :: Map String Valor -> String -> String -> (Patron,Statement) -> (Map String Valor,String)
 ejecutarPatronStatement memoria linea salida (BEGIN,st) = 
 	if ((Map.member "-1" memoria) || (Map.member "-2" memoria)) then
 		(memoria,salida)
@@ -148,7 +150,7 @@ ejecutarPatronStatement memoria linea salida (Pat e,st) =
 	in 
 	-- SI HAY ERROR PREGUNTANDO POR LA FLAG LO AGREGO AL STRING DE SALIDA
 	if (Map.member "-1" (fst dupla)) then
-		(fst dupla, salida ++ ( (fst dupla) Map.! "-1"))
+		(fst dupla, salida ++ (show ((fst dupla) Map.! "-1")))
 	else if (Map.member "-2" (fst dupla)) then -- Me fijo si hay un exit
 		(fst dupla, salida) 
 	else 
@@ -160,17 +162,17 @@ ejecutarPatronStatement memoria linea salida (Pat e,st) =
 			(fst dupla,salida)
 	
 
-definirTope :: Map String String -> Map String String
+definirTope :: Map String Valor -> Map String Valor
 definirTope memoria  
 	| (Map.member "-3" memoria) =
 		let nfAnterior = memoria Map.! "-3"
 		in 
-			quitarVariablesPesos (toInt (Str nfAnterior)) memoria
+			quitarVariablesPesos (toInt (nfAnterior)) memoria
 	| otherwise = 
 		memoria
 
 
-quitarVariablesPesos :: Int -> Map String String -> Map String String
+quitarVariablesPesos :: Int -> Map String Valor -> Map String Valor
 quitarVariablesPesos tope memoria  
 	| (tope == 0) = memoria 
 	| (tope > 1) = do
@@ -200,6 +202,6 @@ patronEq _ _ = False
 instance Eq Patron where
   a == b = patronEq a b
 
-evalError :: Map String String -> Bool
+evalError :: Map String Valor -> Bool
 evalError m = Map.member "-1" m 
 

@@ -9,15 +9,10 @@ import Eval
 -- La funcion de este modulo es ejecutar un statement con cierta memoria y devolver la memoria eventualemnte
 -- modificada y la salida acumulada.
 
-execute :: Map String String -> Statement -> String -> (Map String String, String)
+execute :: Map String Valor -> Statement -> String -> (Map String Valor, String)
 
 -- Empty
-execute m Empty s
-	| evalError m  == True = (m, s)
-	| evalExit m  == True = (m, s)
-	| otherwise = (m, s)
-
-
+execute m Empty s = (m, s)
 
 -- Simple Expr
 execute m (Simple a) s
@@ -25,46 +20,36 @@ execute m (Simple a) s
 	| evalExit m  == True = (m, s)
 	| otherwise = let dupla = eval m a
 				in if (evalError (fst dupla)) then 
-						(fst dupla, s ++ ((fst dupla) Map.! "-1"))
+						(fst dupla, s ++ (show ((fst dupla) Map.! "-1")))
 					else
 						((fst dupla), s)
 
 
 
 -- Print [Expr]
--- Test1: execute (Map.fromList [("1","10"), ("2","20")]) (Print [(Lit 1), (Op2 Mod (Lit 2) (Var "2")), (Lit 3)]) ""
---   OUT> (fromList [("1","10"),("2","20")],"1\t2\t3\n")
--- Test2: execute (Map.fromList [("1","10"), ("2","20")]) (Print [(Lit 1), (Op2 Mul (Lit 2) (Var "2")), (Lit 3)]) ""
---   out> (fromList [("1","10"),("2","20")],"1\t40\t3\n") 
--- Test3: *Execute Data.Map> execute (Map.fromList [("1","10"), ("2","20"), ("3", "0")]) (Print [(Lit 1), (Op2 Mod (Lit 2) (Var "3")), (Lit 3)]) ""
---   OUT> (fromList [("1","10"),("2","20"),("3","0")],"awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n")
 execute m (Print l) s
 	| evalError m  == True = (m, s)
 	| evalExit m  == True = (m, s)
 	| otherwise = let hayError = execute' m (Print l) ""
 				in if ((snd hayError) /= "") then
-						((fst hayError), s ++ (snd hayError))
+						((fst hayError), s ++ (show (snd hayError)))
 					else
 						execute'' m (Print l) s
 
 
 
 -- Exit
-execute m Exit s = let memoria = Map.insert "-2" "Exit" m
+execute m Exit s = let memoria = Map.insert "-2" (Str "Exit") m
 				in (memoria, s)
 
 
 
 -- Sequence [Statement]
--- Test1: execute (Map.fromList [("1","10"), ("2","20"), ("3", "0")]) (Sequence [(Print [(Lit 1), (Op2 Mod (Lit 2) (Var "3")), (Lit 3)]), (Simple (PP True True "1"))]) ""
---   OUT> (fromList [("1","11"),("2","20"),("3","0")],"awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n")
--- Test2: execute (Map.fromList [("1","10"), ("2","20"), ("3", "0")]) (Sequence [(Print [(Lit 1), (Op2 Mul (Lit 2) (Var "3")), (Lit 3)]), (Simple (PP True True "1"))]) ""
---   OUT> (fromList [("1","11"),("2","20"),("3","0")],"1\t0\t3\n")
 execute m (Sequence l) s
 	| evalError m  == True = (m, s)
 	| evalExit m  == True = (m, s)
 	| length l > 1 = let dupla = execute m (head l) (s)
-					in if ((evalError (fst dupla)) || (evalExit (fst dupla))) then -- VER ACA QUE PASA CON EL Exit.
+					in if ((evalError (fst dupla)) || (evalExit (fst dupla))) then
 							dupla
 						else
 							execute (fst dupla) (Sequence (tail l)) (snd dupla)
@@ -72,20 +57,14 @@ execute m (Sequence l) s
 
 
 -- If Expr Statement Statment
--- Test1: putStrLn (snd (execute (Map.fromList [("1","10"), ("2","20")]) (If (Var "1") (Print [(Lit 1), (Op2 Mod (Lit 2) (Var "2")), (Lit 3)]) (Print (Var "2"))) ""))
---   OUT> 1       2       3
 execute m (If a st1 st2) s
 	| evalError m  == True = (m, s)
 	| evalExit m  == True = (m, s)
 	| evalError (fst (eval m a)) == True = let dupla = eval m a
-										in (fst dupla, s ++ ((fst dupla) Map.! "-1"))
+										in (fst dupla, s ++ (show ((fst dupla) Map.! "-1")))
 	| otherwise = let 
 				dupla = eval m a
-				condicion = if ((toIntMb (snd dupla)) == Nothing) then
-								(Str (show (snd dupla)))
-					  		else
-								(Num (toInt (snd dupla)))
-				in if (((toBool condicion)) == True) then 
+				in if (((toBool (snd dupla))) == True) then 
 						execute (fst dupla) st1	s
 					else
 						execute (fst dupla) st2 s
@@ -98,7 +77,7 @@ execute m (For a1 a2 a3 st) s
 	| otherwise = let 
 				dupla1 = eval m a1
 				in if (evalError (fst dupla1)) then
-							(fst dupla1, s ++ ((fst dupla1) Map.! "-1"))
+							(fst dupla1, s ++ (show ((fst dupla1) Map.! "-1")))
 						else
 							execute''' (fst dupla1) a2 a3 st s
 
@@ -110,7 +89,7 @@ execute m (While a st) s
 	| otherwise = let 
 				dupla = eval m a
 				in if (evalError (fst dupla)) then
-						(fst dupla, s ++ ((fst dupla) Map.! "-1"))
+						(fst dupla, s ++ (show ((fst dupla) Map.! "-1")))
 					else
 						if (toBool (snd dupla)) then
 							let 
@@ -137,42 +116,12 @@ execute m (DoWhile st a) s
 						let 
 						result = eval (fst dupla) a
 						in if(evalError (fst result)) then
-								(fst result, (snd dupla) ++ ((fst result) Map.! "-1"))
+								(fst result, (snd dupla) ++ (show ((fst result) Map.! "-1")))
 							else
 								if (toBool (snd result)) then
 									execute (fst result) (DoWhile st a) (snd dupla)	
 								else 
 									(fst result, snd dupla)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 --------------------------------------------------------------------------------------------------
@@ -186,40 +135,33 @@ toString maybeValue = case maybeValue of
 
 
   
-evalError :: Map String String -> Bool
+evalError :: Map String Valor -> Bool
 evalError m = Map.member "-1" m
 
-evalExit :: Map String String -> Bool
+evalExit :: Map String Valor -> Bool
 evalExit m = Map.member "-2" m 
 
 
 
 -- Averigua si se va a dar error al ejecutar la secuencia de expresiones.
--- Test1: execute' (Map.fromList [("1","10")]) (Print [(Lit 1), (Lit 2), (Lit 3)]) ""
---   OUT> (fromList [("1","10")], "")
--- Test2: execute' (Map.fromList [("1","10")]) (Print [(Lit 1), (Op2 Mod (Lit 2) (Lit 0)), (Lit 3)]) ""
---   OUT> (fromList [("-1","awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n"),("1","10")],"awk: cmd. line:1: (FILENAME=- FNR=1) fatal: division by zero attempted\n")
--- Test3: execute' (Map.fromList [("1","10"), ("2","20")]) (Print [(Lit 1), (Op2 Mod (Lit 2) (Var "2")), (Lit 3)]) ""
---   OUT> (fromList [("1","10"),("2","20")],"")
-execute' :: Map String String -> Statement -> String -> (Map String String, String)
+execute' :: Map String Valor -> Statement -> String -> (Map String Valor, String)
 execute' m (Print l) s
 	| s /= "" = (m, s)
 	| length l > 1 = let dupla = (eval m (head l))
 					in if ((evalError (fst dupla)) == True) then
-					 	((fst dupla), (fst dupla) Map.! "-1")
+					 	((fst dupla), (show ((fst dupla) Map.! "-1")))
 					else
 						execute' (fst dupla) (Print (tail l)) s
 	| otherwise = let dupla = (eval m (head l))
 				in if ((evalError (fst dupla)) == True) then
-						((fst dupla), (fst dupla) Map.! "-1")
+						((fst dupla), (show ((fst dupla) Map.! "-1")))
 					else 
 						((fst dupla), "")
 
 
 -- Toma una memoria, una lista de expresiones a imprimir y agrega su salida a la salida acumulada
--- PRECONDICION: No puede existir error en la ejecucion de ninguna de las expresiones.
--- Test1: 
-execute''  :: Map String String -> Statement -> String -> (Map String String, String)
+-- PRECONDICION: No puede existir error en la ejecucion de ninguna de las expresiones.s
+execute''  :: Map String Valor -> Statement -> String -> (Map String Valor, String)
 execute'' m (Print l) s
 	| evalError m  == True = (m, s)
 	| length l > 1 = let dupla = (eval m (head l)) 
@@ -228,12 +170,12 @@ execute'' m (Print l) s
 				in (fst dupla, s ++ (show (snd dupla)) ++ "\n")
 
 
-execute''' :: Map String String -> Expr -> Expr -> Statement -> String -> (Map String String, String)
+execute''' :: Map String Valor -> Expr -> Expr -> Statement -> String -> (Map String Valor, String)
 execute''' m a2 a3 st s
 	| evalError m  == True = (m, s) 
 	| otherwise = let dupla1 = eval m a2
 				in if (evalError (fst dupla1)) then
-						(fst dupla1, s ++ ((fst dupla1) Map.! "-1"))
+						(fst dupla1, s ++ (show ((fst dupla1) Map.! "-1")))
 					else
 					  	if ((toBool (snd dupla1)) == True) then
 					  		let 
@@ -243,7 +185,7 @@ execute''' m a2 a3 st s
 					  				body
 					  			else
 					  				if (evalError (fst inc)) then
-					  					(fst inc, (snd body) ++ ((fst inc) Map.! "-1"))
+					  					(fst inc, (snd body) ++ (show ((fst inc) Map.! "-1")))
 					  				else
 					  					if (evalExit (fst inc)) then
 					  						(fst inc, snd body)
