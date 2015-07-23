@@ -1,4 +1,4 @@
-# programacion-funcional
+# Obligatorio Programación Funcional
 Repositorio con la resolución del obligatorio de la materia "Introducción a la Programación Funcional - Edición 2015"
 
 
